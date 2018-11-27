@@ -1,0 +1,107 @@
+{% extends "layouts/main.html" %}
+{% block body %}
+  {# start main body #}
+  <div class="container sub-banner" id="transactions">
+    <div class="row">
+      {# start sidebar #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Messages</h4>
+          {# <p><i>Inbox</i></p> #}
+          <ul class="list-unstyled">
+            <li><a href="{{ url_for('UserBP.view_message_list') }}">Inbox</a></li>
+            <li><a class="active_category" href="#">Archive</a></li>
+          </ul>
+        </div>
+      </div> {# end sidebar #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        {# start breadcrumbs #}
+        <div class="col-lg-12">
+          <div class="row">
+            <div class="col-sm-4">
+              <h5 class="center-page-header">Archive</h5>
+            </div>
+          </div>
+          <hr class="header-line">
+        </div> {# end breadcrumbs #}
+
+        <div class="col-lg-12">
+          <ol class="breadcrumb">
+            <li><a href="{{ url_for('UserBP.home_page') }}">Home</a></li>
+            <li class="active">Archive</li>
+          </ol>
+        </div>
+
+        {% if messages|length == 0 %}
+
+        <div class="blank-page">
+          <div class="empty-box text-center">
+            <p style="font-weight: bold; font-size: 30px; margin-top: 250px;"><span>You don't have any messages at the moment.</span></p>
+            <p style="margin-top: 30px; font-weight: bold;"><span>Don't wait! Start browsing now!</span></p>
+            <p class="btn-horizontal-list"><a class="btn btn-primary" href="{{ url_for('UserBP.home_page') }}"><span>Browse Resources</span></a></p>
+          </div>
+        </div>
+
+        {% else %}
+
+        {# start message list #}
+        <div class="col-lg-12">
+          {% for message in messages %}
+            <div class="transaction-row">
+              <a href="{{ url_for('UserBP.archived_message', message_id=message.id) }}" class="inherit-link">
+                <div class="row">
+                  {% for participant in message.participants %}
+                    {% if participant.account_id != current_user.id %}
+                      <div class="col-sm-4 col-xs-2 transaction-profile">
+                        <div class="media">
+                          <div class="media-left">
+                            <div class="transaction-avatar">
+                              <img src="{{ participant.account_image_url }}" alt="">
+                            </div>
+                          </div>
+                          <div class="media-body">
+                            <div class="text-small">
+                              {{ participant.account_name }}
+                              {% if message.unread_message_count >= 1 %}
+                              <b>({{ message.unread_message_count }})</b>
+                              {% endif %}
+                            </div>
+                            <div class="text-smaller text-muted">
+                              <span>
+                                {{ message.last_message.date_created.strftime('%d %B, %Y %H:%M') }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                  <div class="col-sm-8 col-xs-10">
+                    <div class="transaction-description">
+                      <div class="text-bold ellipsis">{{ message.resource.name }}</div>
+                      <div class="text-small">S${{ message.resource.price }}</div>
+                      <div>
+                        {% if message.last_message.author_id == current_user.id %}
+                          <span class="text-smaller text-muted">You: {{ message.last_message.message }}</span>
+                          {% else %}
+                          <span class="text-smaller text-muted">{{ message.last_message.account_name }}: {{ message.last_message.message }}</span>
+                          {% endif %}
+                      </div>
+                      <div class="transaction-icon-img">
+                        <img src="{{ message.resource.image_url or 'http://placehold.it/400x400/000/fff' }}" alt="" class="transaction-product-img">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+          {% endfor %}
+        </div> {# end message list #}
+        {% endif %}
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock %}

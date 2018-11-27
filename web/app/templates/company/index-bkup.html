@@ -1,0 +1,81 @@
+{% extends "layouts/main.html" %}
+{% block head %}
+  <link href="{{ url_for('static', filename='assets/css/rateyo.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='assets/css/selectize.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='assets/css/selectize.default.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+  {# start main body #}
+<div class="container" id="profile">
+    <div class="row">
+      {# start sidebar category #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Category</h4>
+
+          <div class="form-group">
+            <select name="categories" id="categories" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);" multiple="multiple" data-placeholder="Search" style="width:100%;" tabindex="5">
+              {% for category in categories %}
+                <optgroup>
+                    <option value="{{base_url}}/categories/{{ category.id }}">{{ category.name }}</option>
+                </optgroup>
+              {% endfor %}
+            </select>
+            <div class="help-block with-errors"></div>
+          </div>
+
+          <input id="scrollup" type="image" width="170" height="20" name="scroll_up" src="{{ url_for('static', filename='assets/img/scrollup.png') }}">
+            <ul id="box" class="list-unstyled" style="height: 340px; overflow: hidden;">
+              {% for category in categories %}
+                <li>
+                  <li class="ellipsis"><a id="category_name" href="{{ url_for ('CategoryBP.view_category_page', category_id=category.id) }}">{{ category.name }}</a></li>
+                </li>
+              {% endfor %}
+            </ul>
+          <input id="scrolldown" type="image" width="170" height="20" name="scroll_down" src="{{ url_for('static', filename='assets/img/scrolldown.png') }}">
+
+          {% if current_user.is_authenticated %}
+          <br>
+          <h4>Resources Needed</h4>
+          <ul class="list-unstyled">
+            {% for wishlist in wishlists %}
+              {% for wish_cat in wishlist.categories %}
+              <li>
+                <li><a href="{{ url_for('ResourceBP.view_wishlist_page', slug=wishlist.reference) }}">{{ wish_cat.main_category_name }}</a></li>
+              </li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+          {% else %}
+          {% endif %}
+        </div>
+      </div> {# end sidebar category #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        <div class="col-lg-12">
+          <h5 class="center-page-header">{{ company.name }}</h5>
+          <hr class="header-line">
+
+          <ol class="breadcrumb">
+            <li><a href="{{ url_for('UserBP.home_page') }}">Home</a></li>
+            <li class="active">{{ company.name }}</li>
+          </ol>
+        </div>
+
+        <div class="row">
+          hello world
+        </div>
+{% endblock %}
+
+{% block lib_javascript %}
+
+{% endblock %}
+
+{% block custom_javascript %}
+
+  <script>
+
+  </script>
+{% endblock %}

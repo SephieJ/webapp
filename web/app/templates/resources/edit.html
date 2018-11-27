@@ -1,0 +1,1816 @@
+{% extends "layouts/main.html" %}
+{% block head %}
+  <link href="{{ url_for('static', filename='assets/css/cropper.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='assets/css/selectize.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='assets/css/selectize.default.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='assets/css/bootstrap-datetimepicker.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='assets/css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='assets/css/bootstrap-datetimepicker-standalone.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+  {# start main body #}
+  <div class="container" id="profile">
+    <div class="row">
+      {# start sidebar #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Resources</h4>
+          <ul class="list-unstyled">
+            <li><a href="{{ url_for ('UserBP.user_resources_page', user_id=current_user.id) }}">My Resources</a></li>
+            <li><a href="{{ url_for('ResourceBP.add_resources_page') }}">Add Resources</a></li>
+            <li><a href="#">Archived Resources</a></li>
+          </ul>
+        </div>
+      </div> {# end sidebar #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        {# start title #}
+        <div class="col-lg-12">
+          <h5 class="center-page-header">Edit Resources</h5>
+          <hr class="header-line">
+        </div> {# end title #}
+
+
+        <div class="container-new-resources">
+          <div class="col-lg-6 col-md-6 col-sm-6">
+            <div class="new-resources">
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-flash alert-{{ category }} alert-dismissible" role="alert" style="margin-top: 10px;">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <!-- <strong>Title</strong> --> {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+              {% endwith %}
+              <div class="">
+                <form id="resource_form" role="form" method="POST" action="{{ url_for('.edit_resources_page', slug=resource.reference) }}" files=true enctype="multipart/form-data">
+                  {{ resource_form.csrf_token }}
+                  {{ resource_form.image_url(id="imgupload", class="form-control", style="display:none",  onchange="document.getElementById('resourcepic').src = window.URL.createObjectURL(this.files[0])") }}
+
+                  {# Category #}
+                  <div class="form-group">
+                    <label for="Category" id="category_label"><span class="text-red">*</span>Category</label>
+                    <select name="categories" id="categories" multiple="multiple" data-placeholder="Choose categories" style="width:100%;" tabindex="5">
+                    {{ resource.categories }}
+                      <option value=""></option>
+                      {% for category in categories %}
+                        <optgroup id="{{ category.name }}" value="{{ category.id }}" label="{{ category.name|safe }}">
+                          {% for subcategory in category.subcategories %}
+                            <option value="{{ subcategory.id }}">{{ subcategory.name|safe }}</option>
+                          {% endfor %}
+                        </optgroup>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  {# Suggest Category Checkbox #}
+                  <div class="checkbox">
+                    <label>
+                      {{ resource_form.suggest_checkbox(value='n') }} <small class="text-muted">{{ resource_form.suggest_checkbox.label.text }}</small>
+                    </label>
+                    <small><em> (Suggested categories are subjected to approval.)</em></small>
+                  </div>
+
+                  {# Parent Category #}
+                  <div class="form-group">
+                    <label for="parent_category" id="parent_category_label">Main Category
+                      <i class="fa fa-question-circle tooltip-icon" aria-hidden="true">
+                        <span class="tooltiptext">
+                          <ul class="nav">
+                            <li>Choose an existing main category or suggest a new category.</li>
+                          </ul>
+                        </span>
+                      </i>
+                    </label>
+                    {{ resource_form.parent_category(placeholder="Choose an existing main category or suggest a new one") }}
+                  </div>
+
+                  {# Subcategory #}
+                  <div class="form-group">
+                    <label for="subcategory" id="subcategory_label">Sub-Category</label>
+                    {{ resource_form.subcategory(placeholder="Input sub-categories") }}
+                  </div>
+
+                  {# Item name #}
+                  {% if resource_form.name.errors %}
+                  <div class="form-group input-display-has-error has-error">
+                  {% else %}
+                  <div class="form-group">
+                  {% endif %}
+                    <label for="name"><span class="text-red">*</span>What is the name of your resource?</label>
+                    {{ resource_form.name(class="form-control", placeholder="Item name", value=resource.resource_name) }}
+                    {% if resource_form.name.errors %}
+                      {% for error in resource_form.name.errors %}
+                          <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+
+                  {# Description #}
+                  {% if resource_form.description.errors %}
+                  <div class="form-group input-display-has-error has-error">
+                  {% else %}
+                  <div class="form-group">
+                  {% endif %}
+                    <label for="Description"><span class="text-red">*</span>Description</label>
+                    {{ resource_form.description(class="form-control", placeholder="Tell us more about your item. e.g. size, condition, colour etc...", rows="5") }}
+                    <div class="help-block with-errors"></div>
+                    {% if resource_form.description.errors %}
+                      {% for error in resource_form.description.errors %}
+                          <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+
+                  {# Quantity #}
+                  {% if resource_form.quantity.errors %}
+                  <div class="form-group input-display-has-error has-error">
+                  {% else %}
+                  <div class="form-group">
+                  {% endif %}
+                    <label for="quantity"><span class="text-red">*</span>Quantity</label>
+                    {{ resource_form.quantity(class="form-control", placeholder="QTY", type='number', min=1, value=resource.quantity) }}
+                    <div class="help-block with-errors"></div>
+                    {% if resource_form.quantity.errors %}
+                      {% for error in resource_form.quantity.errors %}
+                          <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+
+                  {# Price #}
+                  {% if resource_form.price.errors %}
+                  <div class="form-group input-display-has-error has-error">
+                  {% else %}
+                  <div class="form-group">
+                  {% endif %}
+                    <label for="price"><span class="text-red">*</span>Price</label>
+                    {{ resource_form.price(class="form-control", placeholder="S$1.00", type='number', step='any', min=1, value=resource.price) }}
+                    <div class="help-block with-errors"></div>
+                    {% if resource_form.price.errors %}
+                      {% for error in resource_form.price.errors %}
+                          <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+
+                  {# Unit Of Measurement #}
+                  {% if resource_form.unit.errors %}
+                  <div class="form-group input-display-has-error has-error">
+                  {% else %}
+                  <div class="form-group">
+                  {% endif %}
+                    <label for="unit"><span class="text-red">*</span>Unit of Measurement</label>
+                    {# {{ resource_form.unit(multiple="multiple", placeholder="Select Unit", style="width:100%;") }} #}
+                    {{ resource_form.unit(placeholder="Select Unit", style="width:100%;") }}
+                    <div class="help-block with-errors"></div>
+                    {% if resource_form.unit.errors %}
+                      {% for error in resource_form.unit.errors %}
+                          <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+
+
+                  <div id='PerQuantity'>
+
+                  </div>
+
+                  <div id="other-unit">
+                    <!-- <div class="form-group">
+                      <label for="rate"><span class="text-red">*</span>Allow bookings during holidays?</label>
+                      <div>
+                        <label class="adj-checkbox label-form">
+                          <input type="radio" name="booking-holidays" value="yes"> Yes
+                        </label>
+                        <label class="adj-checkbox label-form">
+                          <input type="radio" name="booking-holidays" value="no" checked> No
+                        </label>
+                      </div>
+                    </div> -->
+
+                    {% if resource_form.booking_holiday.errors %}
+                    <div class="form-group input-display-has-error has-error">
+                    {% else %}
+                    <div class="form-group">
+                    {% endif %}
+                      <label for="booking_holiday"><span class="text-red">*</span>Allow bookings during holidays?</label>
+                        <div>
+                          {% for rate in resource_form.booking_holiday %}
+                            <label class="adj-checkbox label-form">
+                              {{ rate }} <b>{{ rate.label.text }}</b>
+                            </label>
+                          {% endfor %}
+                        </div>
+                      <div class="help-block with-errors"></div>
+                      {% if resource_form.booking_holiday.errors %}
+                        {% for error in resource_form.booking_holiday.errors %}
+                            <span class="help-block">{{ error }}</span>
+                        {% endfor %}
+                      {% endif %}
+                    </div>
+
+                    {% if resource_form.availability.errors %}
+                    <div class="form-group input-display-has-error has-error">
+                    {% else %}
+                    <div class="form-group">
+                    {% endif %}
+                      <label for="rate"><span class="text-red">*</span>
+                        Do you want to retain the other default settings for the resource availabilty?
+                        <i class="fa fa-question-circle tooltip-icon-reg" aria-hidden="true" style="z-index:10;"></i>
+                      </label>
+                        <div>
+                          {% for rate in resource_form.availability %}
+                            <label class="adj-checkbox label-form">
+                              {{ rate }} <b>{{ rate.label.text }}</b>
+                            </label>
+                          {% endfor %}
+                        </div>
+                      <div class="help-block with-errors"></div>
+                      {% if resource_form.availability.errors %}
+                        {% for error in resource_form.availability.errors %}
+                            <span class="help-block">{{ error }}</span>
+                        {% endfor %}
+                      {% endif %}
+                    </div>
+
+
+                    <div id="custom-availability">
+                      <div class="form-group">
+                        <label>Please specify the duration of availability for this resource:</label>
+                        <span class="input-group">
+                          <span>From </span>
+                          <!-- <input class="form-control3 duration-of-availability-from" placeholder="dd-mm-yyyy" value=""> -->
+                          {{ resource_form.avail_from(class='form-control3 duration-of-availability-from', placeholder='dd-mm-yyyy', value='') }}
+
+                          <span> To </span>
+                          <!-- <input class="form-control3 duration-of-availability-to" placeholder="dd-mm-yyyy" value=""> -->
+                          {{ resource_form.avail_to(class='form-control3 duration-of-availability-to', placeholder='dd-mm-yyyy', value='') }}
+                        </span>
+                      </div>
+
+                      <div class="form-group">
+                        <span class="input-group">
+                          <div class="help-block with-errors"></div>
+                          {% if resource_form.avail_from.errors %}
+                            {% for error in resource_form.avail_from.errors %}
+                                <span class="help-block">{{ error }}</span>
+                            {% endfor %}
+                          {% endif %}
+
+                          <div class="help-block with-errors"></div>
+                          {% if resource_form.avail_to.errors %}
+                            {% for error in resource_form.avail_to.errors %}
+                                <span class="help-block">{{ error }}</span>
+                            {% endfor %}
+                          {% endif %}
+                        </span>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="Daysoftheweek"><span class="text-red"></span>Which days of the week would you like to make this resource available?</label>
+                          <div>
+                            <label class="adj-checkbox label-form">
+                              <!-- <input type="checkbox" class="checkbox-day" value="monday" checked> Mon -->
+                              {{ resource_form.monday(class='checkbox-day', value='monday') }} Mon
+                            </label>
+                            <label class="adj-checkbox label-form">
+                              <!-- <input type="checkbox" class="checkbox-day" value="tuesday" checked> Tue -->
+                              {{ resource_form.tuesday(class='checkbox-day', value='tuesday') }} Tue
+                            </label>
+                            <label class="adj-checkbox label-form">
+                              <!-- <input type="checkbox" class="checkbox-day" value="wednesday" checked> Wed -->
+                              {{ resource_form.wednesday(class='checkbox-day', value='wednesday') }} Wed
+                            </label>
+                            <label class="adj-checkbox label-form">
+                              <!-- <input type="checkbox" class="checkbox-day" value="thursday" checked> Thu -->
+                              {{ resource_form.thursday(class='checkbox-day', value='thursday') }} Thu
+                            </label>
+                            <label class="adj-checkbox label-form">
+                              <!-- <input type="checkbox" class="checkbox-day" value="friday" checked> Fri -->
+                              {{ resource_form.friday(class='checkbox-day', value='friday') }} Fri
+                            </label>
+                            <label class="adj-checkbox label-form">
+                              <!-- <input type="checkbox" class="checkbox-day" value="saturday"> Sat -->
+                              {{ resource_form.saturday(class='checkbox-day', value='saturday') }} Sat
+                            </label>
+                            <label class="adj-checkbox label-form">
+                              <!-- <input type="checkbox" class="checkbox-day" value="sunday"> Sun -->
+                              {{ resource_form.sunday(class='checkbox-day', value='sunday') }} Sun
+                            </label>
+                            <label class="adj-checkbox label-form">
+                              <!-- <input type="checkbox" value="sunday" id="select_all"> All -->
+                              {{ resource_form.select_all(value='sunday') }} All
+                            </label>
+                          </div>
+                      </div>
+
+                      <!-- <div class="form-group">
+                        <label for="rate">
+                          Do you want to retain the default settings for the hours of the day that the resources will be available?
+                        </label>
+                        <div>
+                          <label class="adj-checkbox label-form">
+                            <input type="radio" name="retain" class="hours-availability" value="yes" checked> Yes
+                          </label>
+                          <label class="adj-checkbox label-form">
+                            <input type="radio" name="retain" class="hours-availability" value="no"> No
+                          </label>
+                        </div>
+                      </div> -->
+
+                      {% if resource_form.retain.errors %}
+                      <div class="form-group input-display-has-error has-error">
+                      {% else %}
+                      <div class="form-group">
+                      {% endif %}
+                        <label for="rate"><span class="text-red">*</span>
+                          Do you want to retain the default settings for the hours of the day that the resources will be available?
+                        </label>
+                          <div>
+                            {% for rate in resource_form.retain %}
+                              <label class="adj-checkbox label-form">
+                                {{ rate }} <b>{{ rate.label.text }}</b>
+                              </label>
+                            {% endfor %}
+                          </div>
+                        <div class="help-block with-errors"></div>
+                        {% if resource_form.retain.errors %}
+                          {% for error in resource_form.retain.errors %}
+                              <span class="help-block">{{ error }}</span>
+                          {% endfor %}
+                        {% endif %}
+                      </div>
+
+                      <div id="custom-hours-availability">
+                        <div class="form-group">
+                          <label for="minutes">If you want to change the unit of measurement, edit the value below.</label>
+                          <span class="input-group">
+                            <!-- <input class="form-control3" id="availability_mins" name="minutes" placeholder="" value="60"> -->
+                            {{ resource_form.avail_mins_from(class="form-control3", placeholder="", type="number", onInput="checkLength(4,this)") }}
+
+                            <span>min(s)</span>
+                          </span>
+                          <div class="help-block with-errors"></div>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="minutes">Do you want to specify gaps in between the availability of the resource? If so, edit the value below.</label>
+                          <span class="input-group">
+                            <!-- <input class="form-control3" id="availability_mins_to" class="" name="minutes" placeholder="0" value=""> -->
+                            {{ resource_form.avail_mins_to(class="form-control3", placeholder="0", type="number", onInput="checkLength(4,this)") }}
+                            <span>min(s)</span>
+                          </span>
+                          <div class="help-block with-errors"></div>
+                        </div>
+
+                        <div class="form-group app">
+                          <label>Define specific hours of the day</label>
+                          <span class="input-group" style="margin-bottom: 10px;">
+                            <span>From </span>
+                            <!-- <input class="form-control3 sched-time from-time" placeholder="00:00" value=""> -->
+                            {{ resource_form.sched_time_from(class="form-control3 sched-time from-time", placeholder="00:00", value="") }}
+                            <span> To </span>
+                            <!-- <input class="form-control3 sched-time to-time" placeholder="00:00" value=""> -->
+                            {{ resource_form.sched_time_to(class="form-control3 sched-time to-time", placeholder="00:00", value="") }}
+                             <i class="fa fa-plus-circle fa-lg" id="add-hours" aria-hidden="true"></i>
+                          </span>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+                  {% if resource.location %}
+
+                  {# Postal Code #}
+                  {% if resource_form.zipcode.errors %}
+                  <div class="form-group input-display-has-error has-error">
+                  {% else %}
+                  <div class="form-group">
+                  {% endif %}
+                    <label for="zipcode">Postal Code</label>
+                    <div class="autocomplete" id="zipcode-autocomplete">
+                      {{ resource_form.zipcode(class="form-control", placeholder="Postal Code", type="number", value=resource.location.zipcode, onInput="checkLength(6,this)") }}
+                    </div>
+                    {% if resource_form.zipcode.errors %}
+                      {% for error in resource_form.zipcode.errors %}
+                          <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+
+                  {# Unit Number #}
+                  {% if resource_form.unit_number.errors %}
+                  <div class="form-group input-display-has-error has-error">
+                  {% else %}
+                  <div class="form-group">
+                  {% endif %}
+                    <label for="unit_number">Unit No.</label>
+                    {{ resource_form.unit_number(class="form-control", placeholder="Unit Number", value=resource.location.unit_number) }}
+                    {% if resource_form.unit_number.errors %}
+                      {% for error in resource_form.unit_number.errors %}
+                          <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+
+                  {# Street #}
+                  {% if resource_form.street.errors %}
+                  <div class="form-group input-display-has-error has-error">
+                  {% else %}
+                  <div class="form-group">
+                  {% endif %}
+                    <label for="street">Street</label>
+                    <div class="autocomplete" id="street-autocomplete">
+                      {{ resource_form.street(class="form-control", placeholder="Street", value=resource.location.street) }}
+                    </div>
+                    {% if resource_form.street.errors %}
+                      {% for error in resource_form.street.errors %}
+                          <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+
+                  {# City #}
+                  {% if resource_form.city.errors %}
+                  <div class="form-group input-display-has-error has-error">
+                  {% else %}
+                  <div class="form-group">
+                  {% endif %}
+                    <label for="city">City</label>
+                    {{ resource_form.city(class="form-control", placeholder="City", value=resource.location.city) }}
+                    {% if resource_form.city.errors %}
+                      {% for error in resource_form.city.errors %}
+                          <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+
+                  {# State #}
+                  {% if resource_form.state.errors %}
+                  <div class="form-group input-display-has-error has-error">
+                  {% else %}
+                  <div class="form-group">
+                  {% endif %}
+                    <label for="state">State</label>
+                    {{ resource_form.state(class="form-control", placeholder="State", value=resource.location.state) }}
+                    {% if resource_form.state.errors %}
+                      {% for error in resource_form.state.errors %}
+                          <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+
+                  {% else %}
+
+                  {# Postal Code #}
+                  {% if resource_form.zipcode.errors %}
+                  <div class="form-group input-display-has-error has-error">
+                  {% else %}
+                  <div class="form-group">
+                  {% endif %}
+                    <label for="zipcode">Postal Code</label>
+                    <div class="autocomplete" id="zipcode-autocomplete">
+                      {{ resource_form.zipcode(class="form-control", placeholder="Postal Code", type="number", value="", onInput="checkLength(6,this)") }}
+                    </div>
+                    {% if resource_form.zipcode.errors %}
+                      {% for error in resource_form.zipcode.errors %}
+                          <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+
+                  {# Unit Number #}
+                  {% if resource_form.unit_number.errors %}
+                  <div class="form-group input-display-has-error has-error">
+                  {% else %}
+                  <div class="form-group">
+                  {% endif %}
+                    <label for="unit_number">Unit No.</label>
+                    {{ resource_form.unit_number(class="form-control", placeholder="Unit Number") }}
+                    {% if resource_form.unit_number.errors %}
+                      {% for error in resource_form.unit_number.errors %}
+                          <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+
+                  {# Street #}
+                  {% if resource_form.street.errors %}
+                  <div class="form-group input-display-has-error has-error">
+                  {% else %}
+                  <div class="form-group">
+                  {% endif %}
+                    <label for="street">Street</label>
+                    <div class="autocomplete" id="street-autocomplete">
+                      {{ resource_form.street(class="form-control", placeholder="Street", value="") }}
+                    </div>
+                    {% if resource_form.street.errors %}
+                      {% for error in resource_form.street.errors %}
+                          <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+
+                  {# City #}
+                  {% if resource_form.city.errors %}
+                  <div class="form-group input-display-has-error has-error">
+                  {% else %}
+                  <div class="form-group">
+                  {% endif %}
+                    <label for="city">City</label>
+                    {{ resource_form.city(class="form-control", placeholder="City", value="") }}
+                    {% if resource_form.city.errors %}
+                      {% for error in resource_form.city.errors %}
+                          <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+
+                  {# State #}
+                  {% if resource_form.state.errors %}
+                  <div class="form-group input-display-has-error has-error">
+                  {% else %}
+                  <div class="form-group">
+                  {% endif %}
+                    <label for="state">State</label>
+                    {{ resource_form.state(class="form-control", placeholder="State", value="") }}
+                    {% if resource_form.state.errors %}
+                      {% for error in resource_form.state.errors %}
+                          <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+
+                  {% endif %}
+                  <div class="form-group" aria-describedby="submit-tooltip">
+                    <button type="submit" id="EditResource" class="btn btn-primary btn-default">
+                      <span>Update my resource</span>
+                    </button>
+                    <p><em>**Cover photo is required.</em></p>
+                  </div>
+                  <div class="photosfield">
+                    {% for i in range(0,8)  %}
+                    {% if i < resource.images|count %}
+                      <input class="inputImage_url" type="hidden" name="inputImage_url[]" id="inputImage{{ i + 1 }}-pickk" value="{{resource.images[i].image}},{{resource.images[i].image_full}}">
+                    {% else %}
+                      <input class="inputImage_url" type="hidden" name="inputImage_url[]" id="inputImage{{ i + 1}}-pickk" value>
+                    {% endif%}
+                    {% endfor %}
+                  </div>
+                  <div class="form-group hidden-keywords"></div>
+                </form>
+
+                <div class="temporary-full-image">
+                  {% for imgs in resource.images %}
+                  <input type="hidden" name="temp_full" id="inputImage{{ loop.index }}-pic-temp">
+                  {% endfor %}
+                </div>
+
+                <div class="temporary-full-image-url">
+                  {% for imgs in resource.images %}
+                  <input type="hidden" name="temp_full_url" id="inputImage{{ loop.index }}-pic-temp-url" value="{{imgs.image_full}}">
+                  {% endfor %}
+                </div>
+
+
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6 col-md-6 col-sm-6">
+            <div class="new-resource-images">
+              <div class="col-xs-12 image-pudding">
+                <div class="img-container" id="img-cropper-container">
+                  <img src="" alt="" class="center-block img-rounded">
+
+                  <div id="btn-container-list" style="display:none;">
+                    <div class="docs-buttons">
+                      <button class="btn btn-sm btn-default btn-transparent" data-method="zoom" data-option="0.1"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                      <button class="btn btn-sm btn-default btn-transparent" data-method="zoom" data-option="-0.1"><i class="fa fa-minus" aria-hidden="true"></i></button>
+                      <button class="btn btn-sm btn-success" data-method="getCroppedCanvas">Crop</button>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <div class="imgBox">
+                {% for img in resource.images[0:1] %}
+                <div class="col-xs-3 thumb-padding">
+                  <label class="rs-thumb rs-thumb-cover">
+                    <div class="rs-thumb-content" id="inputImage1-wrap">
+                      <img src="{{ img.image }}" alt="" name="inputImage[]" id="inputImage1-pic" width="100%" style="display: block;"><i class="fa fa-picture-o" style="display: none;"></i>
+                      <span class="rs-cover">Cover</span>
+                      <button class="btn btn-sm btn-danger thumb-del" type="button" id="remove-button"><i class="fa fa-times fa-lg" aria-hidden="true" id="remove-button"></i></button>
+                    </div>
+                  </label>
+                </div>
+                {% endfor %}
+
+                {% for imgs in resource.images[1:] %}
+                <div class="col-xs-3 thumb-padding">
+                  <label class="rs-thumb rs-thumb-cover">
+                    <div class="rs-thumb-content" id="inputImage{{ loop.index + 1 }}-wrap">
+                      <img src="{{ imgs.image }}" alt="" name="inputImage[]" id='inputImage{{ loop.index + 1 }}-pic' width="100%" style="display: block;"><i class="fa fa-picture-o" style="display: none;"></i>
+                      <button class="btn btn-sm btn-danger thumb-del" type="button" id="remove-button"><i class="fa fa-times fa-lg" aria-hidden="true" id="remove-button"></i></button>
+                    </div>
+                  </label>
+                </div>
+                {% endfor %}
+              </div>
+
+              <div class="col-xs-12">
+                <div class="small"><em>Accepted formats (.JPG, .JPEG, .PNG)</em></div>
+              </div>
+
+              <input type="file" class="inputImage" id="inputImage1" style="display:none;">
+              <input type="file" class="inputImage" id="inputImage2" style="display:none;">
+              <input type="file" class="inputImage" id="inputImage3" style="display:none;">
+              <input type="file" class="inputImage" id="inputImage4" style="display:none;">
+              <input type="file" class="inputImage" id="inputImage5" style="display:none;">
+              <input type="file" class="inputImage" id="inputImage6" style="display:none;">
+              <input type="file" class="inputImage" id="inputImage7" style="display:none;">
+              <input type="file" class="inputImage" id="inputImage8" style="display:none;">
+            </div>
+            <div style="margin-top: 30rem;">
+              <label for="keywords_field">Keywords</label>
+              <input type="text" name="keywords_field" id="keywords_field">
+              <div id="error-alert"></div>
+            </div>
+          </div>
+          <br><br>
+        </div>
+
+
+
+
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock %}
+
+{% block lib_javascript %}
+  <script src="{{ url_for('static', filename='assets/js/selectize.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/cropper.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/cropper-main.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/jquery.validate.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/additional-methods.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/selectize_no_result_plugin.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/bootstrap-datetimepicker.min.js') }}"></script>
+{% endblock %}
+
+{% block custom_javascript %}
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    $("#categories > optgroup").filter(function(){
+      return this.id == "Others";
+    }).insertAfter("#categories > optgroup:last");
+
+    var keywordsArray = JSON.parse("{{ resource.keywords|safe }}".replace(/'/g, '"'));
+    keywordsArray = new Set(keywordsArray);
+
+    $("#keywords_field").selectize({
+      plugins: ['restore_on_backspace', 'remove_button'],
+      maxItems: 6,
+      delimiter: ',',
+      persist: false,
+      onInitialize: function(){
+        keywordsArray.forEach(function(keyword) {
+          this.addOption({ value: keyword, text: keyword });
+          this.addItem(keyword, true);
+        }.bind(this));
+        populateKeywordsField(keywordsArray);
+      },
+      create: function(input, callback) {
+        $.post("{{ url_for('.check_profane_keyword') }}", {
+          "keyword": input
+        }, function(result) {
+          if (result.status !== "invalid") {
+            var item = input.split(' ').join('');
+            callback({ value: item, text: item });
+          } else {
+            displayWarningKeyword(result);
+            callback(null);
+          }
+        });
+      },
+      onOptionAdd: function(value, data) {
+        if (!keywordsArray.has(value)) {
+          keywordsArray.add(value)
+          populateKeywordsField(keywordsArray);
+        }
+      },
+      onOptionRemove: function(value) {
+        keywordsArray.delete(value);
+        populateKeywordsField(keywordsArray);
+      }
+    });
+
+    function populateKeywordsField(keywordsArray) {
+      var parent = document.querySelector(".hidden-keywords");
+
+      while (parent.hasChildNodes()) {
+        parent.removeChild(parent.lastChild);
+      }
+
+      Array.from(keywordsArray).map(function(keyword, index) {
+        var input = document.createElement("input");
+        var num = index + 1;
+        input.setAttribute("type", "hidden");
+        input.setAttribute("name", "keywords[]");
+        input.setAttribute("id", "keyword"+num);
+        input.setAttribute("value", keyword);
+        return parent.appendChild(input);
+      });
+    }
+
+    function displayWarningKeyword(result) {
+      var warning = [
+        '<div class="alert alert-danger alert-dismissible" role="alert">',
+          '<button type="button" class="close" data-dismiss="alert" aria-label="Close">',
+            '<span aria-hidden="true">&times;</span>',
+          '</button>',
+          '<strong>Profanity Warning!</strong> ' + result.message[0],
+        '</div>'
+      ];
+      var parent = document.querySelector("#error-alert");
+      while(parent.hasChildNodes()) {
+        parent.removeChild(parent.lastChild);
+      }
+      $("#error-alert").append(warning.join(''));
+      $(".alert-danger").fadeTo(2000, 500).slideUp(500, function(){
+        $(".alert-danger").alert('close');
+      });
+    }
+
+    // populate street, zipcode, city and state if empty
+    var currentUserCompany = JSON.parse("{{ current_user_company|safe }}".replace(/'/g, '"'));
+      
+    var street = document.getElementById("street");
+    var zipcode = document.getElementById("zipcode");
+    var city = document.getElementById("city");
+    var state = document.getElementById("state");
+    
+    if (!street.value)
+      street.value = (!!currentUserCompany.block_street) ? currentUserCompany.block_street : '';
+    if (!zipcode.value)
+      zipcode.value = (!!currentUserCompany.postal_code) ? currentUserCompany.postal_code : '';
+    if (!city.value)
+      city.value = (Object.keys(currentUserCompany).length !== 0) ? "SINGAPORE" : '';
+    if (!state.value)
+      state.value = (Object.keys(currentUserCompany).length !== 0) ? "SINGAPORE" : '';
+  });
+</script>
+
+<script type="text/javascript">
+  console.log("This is from cropper JS: " + window.upload_img_ctr);
+  $("#EditResource").click(function(event) {
+    console.log("Current Upload Ctr: " + window.upload_img_ctr);
+    if (window.upload_img_ctr > 0){
+      event.preventDefault();
+    }
+    else {
+      var images = $('.inputImage_url').val()
+      if (images.length == 0) {
+        alert("Please upload a cover photo.");
+        event.preventDefault();
+      } else {
+        $("#EditResource").submit();
+      }
+    }
+  });
+
+      // document.ready
+  $( document ).ready(function() {
+    $("#parent_category").hide();
+    $("#parent_category_label").hide();
+    $("#subcategory").hide();
+    $("#subcategory_label").hide();
+    initCategorySel();
+  });
+
+  // show/hide suggest category
+  $('#suggest_checkbox').change(function() {
+    if (this.checked) {
+      // hide categories
+      $('#categories')[0].selectize.clear();
+      $('#categories')[0].selectize.destroy();
+      $('#category_label').hide();
+      $('#categories').hide();
+      $("#categories-error").hide();
+
+      // show parent categories
+      initParentCategorySel();
+      initSubcategorySel();
+      $('#parent_category_label').show();
+      $('#subcategory_label').show();
+
+      //$('#parent_category')[0].selectize.setValue($('#parent_category')[0].selectize.search('Others').items[0].id)
+      $('#parent_category')[0].selectize.setValue("");
+    } else {
+      // show category
+      initCategorySel();
+      $('#category_label').show();
+      $("#categories-error").show();
+
+      // hide parent categories
+      $('#parent_category')[0].selectize.clear();
+      $('#parent_category')[0].selectize.destroy();
+      $('#parent_category_label').hide();
+      $('#parent_category').hide();
+
+      // hide subcategories
+      $('#subcategory')[0].selectize.clear();
+      $('#subcategory')[0].selectize.destroy();
+      $('#subcategory_label').hide();
+      $('#subcategory').hide();
+    }
+  });
+
+  // init category selectize
+  function initCategorySel() {
+    $('#categories').selectize({
+      maxItems: 1,
+      searchField: ['text', 'optgroup'],
+      plugins: ['remove_button', 'restore_on_backspace', 'no_results'],
+      onChange: function(value) {
+        if(value !== null) {
+          $("#categories-error").hide();
+        } else {
+          $("#categories-error").show();
+        }
+      },
+      lockOptgroupOrder: true,
+      onDropdownOpen: function() {
+        this.$dropdown_content[0].scrollTop = 0;
+      }
+    });
+
+    var selected_categories = JSON.parse('{{ resource.categories|tojson }}');
+    for (var category in selected_categories) {
+      $('#categories')[0].selectize.addItem(selected_categories[category].subcategory.id);
+    }
+  }
+
+  // init parent category selectize
+  function initParentCategorySel() {
+    $('#parent_category').selectize({
+      delimiter: ',',
+      persist: true,
+      maxItems: 1,
+      create: function(input) {
+        return {
+            value: input,
+            text: input
+        }
+      },
+      onChange: function(value) {
+        if(value !== null) {
+          $("#parent_category-error").hide();
+        } else {
+          $("#parent_category-error").show();
+        }
+      }
+    });
+
+    // populate parent category
+    var categories = JSON.parse('{{ categories|tojson }}');
+    var other;
+    for (var category in categories) {
+      category_name = categories[category].name.replace(/&amp;/g, '&');
+      if (categories[category].name !== "Others") {
+        $('#parent_category')[0].selectize.addOption({
+          value: categories[category].id,
+          text: category_name
+        });
+      } else {
+        other = {value: categories[category].id,
+                text: categories[category].name}
+      }
+    }
+    $('#parent_category')[0].selectize.addOption(other);
+  }
+
+  // init subcategory selectize
+  function initSubcategorySel() {
+    $('#subcategory').selectize({
+      plugins: ['remove_button', 'restore_on_backspace'],
+      maxItems: 1,
+      persist: false,
+      create: function(input) {
+        return {
+            value: input,
+            text: input
+        }
+      },
+      onChange: function(value) {
+        console.log(value);
+        if(value !== "") {
+          $("#subcategory-error").hide();
+        } else {
+          $("#subcategory-error").show();
+        }
+      }
+    });
+  }
+
+  // Get the amount of images on the current page
+  var img = $("[name='inputImage[]']");
+  var amountOfImg = img.length;
+  var amountToCount = 8;
+  var blankImg = amountToCount - amountOfImg;
+  var styleCtr = amountOfImg + 1;
+
+  // Prerequisites is to have a div with the class "imgBox" where you want the
+  // fields to appear where you add images
+  for (var i = 0; i < blankImg; i++) {
+    var imgWrap = 'inputImage' + styleCtr + '-wrap';
+    var imgPic = 'inputImage' + styleCtr + '-pic';
+    $(".imgBox").append("<div class='col-xs-3 thumb-padding'><label class='rs-thumb rs-thumb-cover'><div class='rs-thumb-content' id=" + imgWrap + "><img src='' alt='' id=" + imgPic + " width='100%' style='display:none;'><i class='fa fa-picture-o'></i></div></label></div>");
+    styleCtr++;
+  }
+</script>
+
+<script>
+  $("#resource_form").validate({
+    rules: {
+      categories: "required",
+      parent_category: "required",
+      subcategory: "required",
+      name: "required",
+      description: "required",
+      quantity: {
+        required: true,
+        digits: true
+      },
+      price: {
+        required: true,
+        number: true,
+        min: 0,
+      },
+      unit: "required",
+      avail_from: "required",
+      avail_to: "required",
+      avail_mins_from: {
+        required: false,
+        digits: true,
+        minlength: 1,
+        maxlength: 4
+      },
+      avail_mins_to: {
+        required: false,
+        digits: true,
+        minlength: 1,
+        maxlength: 4
+      },
+      zipcode: {
+        required: false,
+        digits: true,
+        minlength: 6,
+        maxlength: 6
+      }
+    },
+    messages: {
+      categories: "Category is required.",
+      parent_category: "Main category is required.",
+      subcategory: "Sub-category is required.",
+      name: "Resource name is required.",
+      description: "Description is required.",
+      quantity: {
+        required: "Quantity is required.",
+      },
+      price: {
+        required: "Price is required.",
+      },
+      unit: "Unit of Measurement is required.",
+      avail_from: "Date is required.",
+      avail_to: "Date is required.",
+    },
+    ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input',
+    errorElement: "span",
+    errorPlacement: function(error, element) {
+      // Add the `help-block` class to the error element
+      error.addClass("help-block has-error");
+      if (element.prop("type") === "checkbox") {
+        error.insertAfter(element.parent("label"));
+      } else {
+        error.insertAfter(element);
+      }
+    },
+    highlight: function(element, errorClass, validClass ) {
+      $(element).parents(".form-group").addClass("has-error").removeClass("has-success");
+    },
+    unhighlight: function(element, errorClass, validClass) {
+      $(element).parents(".form-group").removeClass("has-error");
+    },
+    focusInvalid: false,
+    invalidHandler: function(event, validator) {
+      if(validator.errorList[0].element.id == 'categories' || validator.errorList[0].element.id == 'parent_category' || validator.errorList[0].element.id == 'subcategory') {
+        $('html, body').animate({
+          scrollTop: $(".new-resources").offset().top
+        }, 0);
+      } else {
+        validator.errorList[0].element.focus();
+      }
+    },
+    submitHandler: function(form) {
+      $("#EditResource").prop("disabled", true);
+      form.submit();
+    }
+  });
+</script>
+
+<script>
+    var unit = $("#unit");
+    var availFrom = $("#avail_from");
+    var availTo = $("#avail_to");
+    var bookmarkHoliday = $("[name='booking_holiday']");
+    var availability = $("[name='availability']");
+    var retain = $("[name='retain']");
+    var dateToEnable = false;
+
+    var resourceObj = JSON.parse('{{ resource|tojson }}');
+
+    function setWeekOrDefaultCalendar(rate) {
+
+      if (rate.toLowerCase() === "week") {
+        availFrom.on("dp.change", function(evt) {
+          var date = moment(evt.date);
+          var dow = date.day();
+          var weeks = [0, 1, 2, 3, 4, 5, 6];
+          var index = weeks.indexOf(dow);
+
+          if (index > -1) {
+            if (index === 0) {
+              weeks.splice(6, 1);
+            } else {
+              weeks.splice(index-1, 1);
+            }
+          }
+          
+          if (dateToEnable) {
+            availTo.data("DateTimePicker").destroy();
+          }
+          availTo.datetimepicker({
+            format: 'DD-MM-YYYY',
+            useCurrent: false,
+            daysOfWeekDisabled: weeks
+          });
+
+          dateToEnable = true;
+
+        });
+        
+      } else {
+
+        availFrom.on("dp.change", function(evt) {
+          if (dateToEnable) {
+            availTo.data("DateTimePicker").destroy();
+          }
+          availTo.datetimepicker({
+            format: 'DD-MM-YYYY',
+            useCurrent: false
+          });
+        });
+        
+      }
+
+    }
+    
+    $('body').on('focus',".sched-time", function(){
+      $(this).datetimepicker({
+        format: 'hh:mm A',
+      });
+    });
+
+    availFrom.datetimepicker({
+      format: "DD-MM-YYYY",
+      useCurrent: false
+    });
+
+    availability.on("change", function(evt) {
+      if ($(this).val().toLowerCase() === "yes") {
+        $("#custom-availability").hide();
+        availFrom.rules("remove", "required");
+        availTo.rules("remove", "required");
+      } else {
+        $("#custom-availability").show();
+        availFrom.rules("add", "required");
+        availTo.rules("add", "required");
+      }
+    });
+
+    retain.on("change", function(evt) {
+      if ($(this).val().toLowerCase() === "yes") {
+        $("#custom-hours-availability").hide();
+      } else {
+        $("#custom-hours-availability").show();
+      }
+    });
+
+    $("[name='unit']").selectize({
+      maxItems: 1,
+      persist: true,
+      
+      onInitialize: function() {
+
+        setWeekOrDefaultCalendar(unit.val());
+
+        if (unit.val() === null || unit.val() === "QTY") {
+          $("#other-unit").hide();
+          availFrom.rules("remove", "required");
+          availTo.rules("remove", "required");
+        } else {
+          $("#other-unit").show();
+
+          var bookmarkHolidayChecked = $("[name='booking_holiday']:checked");
+          var availabilityChecked = $("[name='availability']:checked");
+
+          $("[name='booking_holiday'][value='" + bookmarkHolidayChecked.val() + "']")
+            .prop("checked", true);
+
+          if (resourceObj.availability !== null) {
+            
+            if (
+              ("available_date_from" in resourceObj.availability) &&
+              ("available_date_to" in resourceObj.availability)
+            ) {
+              $("#custom-availability").show();
+              $("[name='availability'][value='No']").prop("checked", true);
+              availFrom.val(moment(resourceObj.availability.available_date_from).format("DD-MM-YYYY"));
+              availTo.val(moment(resourceObj.availability.available_date_to).format("DD-MM-YYYY"));
+            } else {
+              $("[name='availability'][value='" + availabilityChecked.val() + "']")
+                .prop("checked", true);
+              $("#custom-availability").hide();
+              availFrom.rules("remove", "required");
+              availTo.rules("remove", "required");
+            }
+
+            var daysOfWeek = Array.from(resourceObj.availability.days_of_week);
+
+            if (daysOfWeek.length > 0) {
+              if (daysOfWeek.length === 7) {
+                $("#select_all").prop("checked", true);
+              } else {
+                $("#select_all").prop("checked", false);
+              }
+              for (day of daysOfWeek) {
+                $(".checkbox-day[name='" + day.toLowerCase() + "']").prop("checked", true);
+              }
+            }
+
+            if (Array.from(resourceObj.availability.schedules).length > 0) {
+
+              $("[name='retain'][value='No']").prop("checked", true);
+              $("#avail_mins_from").val(resourceObj.availability.duration);
+              $("#avail_mins_to").val(resourceObj.availability.gap);
+              
+              Array.from(resourceObj.availability.schedules).forEach(function(schedule, index) {
+                if (index === 0) {
+                  $("[name='sched_time_from']").first().val(moment(schedule.from).format("hh:mm A"));
+                  $("[name='sched_time_to']").first().val(moment(schedule.to).format("hh:mm A"));
+                } else {
+                  $('.app').append('<span class="input-group additional" style="margin-bottom: 10px;">' +
+                    '<span>From </span>' +
+                    '<input class="form-control3 sched-time from-time" id="sched_time_from" name="sched_time_from" placeholder="00:00" type="text" value="' + moment(schedule.from).format("hh:mm A") + '">' +
+                    '<span> To </span>' +
+                    '<input class="form-control3 sched-time to-time" id="sched_time_to" name="sched_time_to" placeholder="00:00" type="text" value="' + moment(schedule.to).format("hh:mm A") + '">' +
+                    '<i class="fa fa-lg fa-remove remove-add"></i>' +
+                    '<br>' +
+                  '</span>');
+                }
+              });
+              
+            } else {
+              $("[name='retain'][value='Yes']").prop("checked", true);
+            }
+
+          }
+
+
+          else {
+
+            $("#custom-availability").hide();
+            $("#custom-hours-availability").hide();
+
+          }
+          
+          /*
+          if (availability.val().toLowerCase() === "yes") {
+            $("#custom-availability").hide();
+            availFrom.rules("remove", "required");
+            availTo.rules("remove", "required");
+          } else {
+            $("#custom-availability").show();
+          }
+          */
+
+          /*
+          $("[name='retain'][value='"+ retain.val() +"']")
+            .prop("checked", true);
+          
+          console.log(retain.val());
+
+          if (retain.val().toLowerCase() === "yes") {
+            $("#custom-hours-availability").hide();
+          } else {
+            $("#custom-hours-availability").show();
+          }
+          */
+        }
+        
+      },
+      
+      onChange: function(value) {
+        if (value.toString().toLowerCase() === "qty") {
+          $("#other-unit").hide();
+          availFrom.val('');
+          availTo.val('');
+        } else {
+          $("#other-unit").show();
+          availFrom.val('');
+          availTo.val('');
+          
+          setWeekOrDefaultCalendar(value.toString());
+
+        }
+        
+        if (availability.val().toLowerCase() === "yes") {
+          $("#custom-availability").hide();
+          availFrom.rules("remove", "required");
+          availTo.rules("remove", "required");
+        } else {
+          $("#custom-availability").show();
+        }
+
+        $("[name='retain'][value='"+ retain.val() +"']")
+          .prop("checked", true);
+        
+        if (retain.val().toLowerCase() === "yes") {
+          $("#custom-hours-availability").hide();
+        } else {
+          $("#custom-hours-availability").show();
+        }
+
+      }
+    });
+
+    $(function () {
+
+      $(document).on('dp.change', '.from-time', function(e){
+        var availMinsFrom = $("#avail_mins_from").val();
+        var time = moment.utc($(this).val(), "hh:mm A");
+        var value = moment(time).add(availMinsFrom, "minutes");
+        $(e.target).closest(".input-group").find(".to-time").val(value.format("hh:mm A"));
+      });
+
+      $(document).on('click', '#add-hours', function(e){
+        e.preventDefault();
+
+        var firstSchedTimeFrom = $("[name='sched_time_from']").first().val();
+        var firstSchedTimeTo = $("[name='sched_time_to']").first().val();
+
+        if (!firstSchedTimeFrom && !firstSchedTimeTo) {
+          var warning = [
+            '<div class="alert alert-danger alert-dismissible" role="alert">',
+              '<button type="button" class="close" data-dismiss="alert" aria-label="Close">',
+                '<span aria-hidden="true">&times;</span>',
+              '</button>',
+              '<strong>Please provide initial schedule before adding new time</strong> ',
+            '</div>'
+          ];
+          var parent = document.querySelector("#error-sched-time");
+
+          while(parent.hasChildNodes()) {
+            parent.removeChild(parent.lastChild);
+          }
+
+          $("#error-sched-time").append(warning.join(''));
+          $(".alert-danger").fadeTo(2000, 500).slideUp(500, function(){
+            $(".alert-danger").alert('close');
+          });
+        }
+        else {
+          var availMinsTo = ($("#avail_mins_to").val()) ? $("#avail_mins_to").val() : 0;
+          var lastMinsTo = $(".app").children().last().find(".to-time").val();
+
+          $('.app').append('<span class="input-group additional" style="margin-bottom: 10px;">' +
+              '<span>From </span>' +
+              '{{ resource_form.sched_time_from(class="form-control3 sched-time from-time", placeholder="00:00", value="") }} ' +
+              '<span> To </span>' +
+              ' {{ resource_form.sched_time_to(class="form-control3 sched-time to-time", placeholder="00:00", value="") }} ' +
+              '<i class="fa fa-lg fa-remove remove-add"></i>' +
+              '<br>' +
+            '</span>');
+          
+          var availMinsFrom = $("#avail_mins_from").val();
+          var time = moment.utc(lastMinsTo, "hh:mm A");
+          var newTime = Number(availMinsFrom) + Number(availMinsTo);
+          var valueFrom = moment(time).add(newTime, "minutes");
+          var valueTo = moment(time).add(newTime + Number(availMinsFrom), "minutes");
+          $(".app").children().last().find(".from-time").val(valueFrom.format("hh:mm A"));
+          $(".app").children().last().find(".to-time").val(valueTo.format("hh:mm A"));
+        }
+
+      });
+
+      $(document).on("click",".remove-add", function(e){ //user click on remove text
+        e.preventDefault();
+        $(this).closest('.additional').remove();
+      });
+
+      // Day checkbox
+      $("#select_all").change(function(){  //"select all" change
+          $(".checkbox-day").prop('checked', $(this).prop("checked")); //change all ".checkbox-day" checked status
+      });
+
+      //".checkbox-day" change
+      $('.checkbox-day').change(function(){
+          //uncheck "select all", if one of the listed checkbox item is unchecked
+          if(false == $(this).prop("checked")){ //if this item is unchecked
+              $("#select_all").prop('checked', false); //change "select all" checked status to false
+          }
+          //check "select all" if all checkbox items are checked
+          if ($('.checkbox-day:checked').length == $('.checkbox-day').length ){
+              $("#select_all").prop('checked', true);
+          }
+      });
+
+
+
+  });
+
+  </script>
+
+<!--
+<script>
+  $(document).ready(function() {
+
+    $('body').on('focus',".sched-time", function(){
+      $(this).datetimepicker({
+        format: 'hh:mm A',
+      });
+    });
+
+    // variable declaration
+    var unit = $("[name='unit']");
+    var bookingHoliday = $("[name='booking_holiday']");
+    var availability = $("[name='availability']");
+    var retain = $("[name='retain']");
+    var availFrom = $("[name='avail_from']").datetimepicker({
+      format: "DD-MM-YYYY",
+      useCurrent: false
+    });
+    var availTo = $("[name='avail_to']");
+    var dateToEnable = false;
+
+    function setAvailabilityValidation(isTrue) {
+      if (isTrue) {
+        $("[name='avail_from']").rules("add", "required");
+        $("[name='avail_to']").rules("add", "required");
+      } else {
+        $("[name='avail_from']").rules("remove", "required");
+        $("[name='avail_to']").rules("remove", "required");
+      }
+    }
+
+    function setAvailToDatepicker(unitValue) {
+      if (unitValue.toLowerCase() === "WEEK".toLowerCase()) {
+        availFrom.on("dp.change", function(event) {
+          var date = moment(event.date);
+          var dow = date.day();
+          var weeks = [0, 1, 2, 3, 4, 5, 6];
+          var index = weeks.indexOf(dow);
+          (index > -1) ? weeks.splice(6, 1) : weeks.splice(index-1, 1);
+          if (dateToEnable) {
+            availTo.data('DateTimePicker').destroy();
+          }
+          availTo.datetimepicker({
+            format: 'DD-MM-YYYY',
+            useCurrent: false,
+            daysOfWeekDisabled: weeks,
+          });
+          dateToEnable = true;
+        });
+      } else {
+        availFrom.on("dp.change", function(event) {
+          if (dateToEnable) {
+            availTo.data("DateTimePicker").destroy();
+          }
+          availTo.datetimepicker({
+            format: "DD-MM-YYYY",
+            useCurrent: false
+          });
+        });
+      }
+    }
+
+    availability.on("change", function() {
+      if ($(this).val().toLowerCase() === "Yes".toLowerCase()) {
+        $("#custom-availability").hide();
+        setAvailabilityValidation(false);
+      } else {
+        $("#custom-availability").show();
+        setAvailabilityValidation(true);
+        setAvailToDatepicker(unit.val());
+
+        $("[name='retain'][value='" + retain.val() + "']").prop("checked", true);
+
+        if (retain.val().toLowerCase() === "Yes".toLowerCase()) {
+          $("#custom-hours-availability").hide();
+        } else {
+          $("#custom-hours-availability").show();
+        }
+      }
+    });
+
+    retain.on("change", function() {
+      if ($(this).val().toLowerCase() === "Yes".toLowerCase()) {
+        $("#custom-hours-availability").hide();
+      } else {
+        $("#custom-hours-availability").show();
+      }
+    });
+
+    // selectize declaration
+    $("[name='unit']").selectize({
+      maxItems: 1,
+      persist: true,
+      
+      onInitialize: function() {
+        if (unit.val().toLowerCase() === "QTY".toLowerCase()) {
+          $("#other-unit").hide();
+          setAvailabilityValidation(false);
+        } else {
+          $("#other-unit").show();
+          $("[name='booking_holiday'][value='" + bookingHoliday.val() + "']").prop("checked", true);
+          $("[name='availability'][value='" + availability.val() + "']").prop("checked", true);
+          
+          if (availability.val().toLowerCase() === "Yes".toLowerCase()) {
+            $("#custom-availability").hide();
+            setAvailabilityValidation(false);
+          } else {
+            $("#custom-availability").show();
+            setAvailabilityValidation(true);
+            setAvailToDatepicker(unit.val());
+
+            $("[name='retain'][value='" + retain.val() + "']").prop("checked", true);
+
+            if (retain.val().toLowerCase() === "Yes".toLowerCase()) {
+              $("#custom-hours-availability").hide();
+            } else {
+              $("#custom-hours-availability").show();
+            }
+
+          }
+        }
+      },
+
+      onChange: function(value) {
+        if (value.toLowerCase() === "QTY".toLowerCase()) {
+          $("#other-unit").hide();
+          setAvailabilityValidation(false);
+        } else {
+          $("#other-unit").show();
+          setAvailabilityValidation(true);
+        }
+        $("#avail_from").val("");
+        $("#avail_to").val("");
+      }
+
+    });
+
+
+
+    $(function () {
+
+      $(document).on('dp.change', '.from-time', function(e){
+        var mins = $('#avail_mins_from').val();
+        var from_val = $(this).val();
+        var time = moment.utc(from_val, 'hh:mm A');
+        var value = moment(time).add(mins, 'minutes');
+        $(e.target).closest('.input-group').find('.to-time').val(value.format('hh:mm A'));
+      });
+
+      $(document).on('click', '#add-hours', function(e){
+        e.preventDefault();
+        $('.app').append('<span class="input-group additional" style="margin-bottom: 10px;">' +
+            '<span>From </span>' +
+            '{{ resource_form.sched_time_from(class="form-control3 sched-time from-time", placeholder="00:00", value="") }} ' +
+            '<span> To </span>' +
+            ' {{ resource_form.sched_time_to(class="form-control3 sched-time to-time", placeholder="00:00", value="") }} ' +
+            '<i class="fa fa-lg fa-remove remove-add"></i>' +
+            '<br>' +
+          '</span>');
+      });
+
+      $(document).on("click",".remove-add", function(e){ //user click on remove text
+        e.preventDefault();
+        $(this).closest('.additional').remove();
+      });
+
+      // Day checkbox
+      $("#select_all").change(function(){  //"select all" change
+          $(".checkbox-day").prop('checked', $(this).prop("checked")); //change all ".checkbox-day" checked status
+      });
+
+      //".checkbox-day" change
+      $('.checkbox-day').change(function(){
+          //uncheck "select all", if one of the listed checkbox item is unchecked
+          if(false == $(this).prop("checked")){ //if this item is unchecked
+              $("#select_all").prop('checked', false); //change "select all" checked status to false
+          }
+          //check "select all" if all checkbox items are checked
+          if ($('.checkbox-day:checked').length == $('.checkbox-day').length ){
+              $("#select_all").prop('checked', true);
+          }
+      });
+
+    });
+
+
+  });
+</script>
+-->
+
+<script>
+  function clear(){
+    $('#minutes').val('');
+    $('.from-time').val('');
+    $('.to-time').val('');
+  }
+
+  function checkLength(len, ele){
+    var fieldLength = ele.value.length;
+    if(fieldLength <= len){
+      return true;
+    } else {
+      var str = ele.value;
+      str = str.substring(0, str.length - 1);
+      ele.value = str;
+    }
+  }
+</script>
+
+  <!-- 
+  <script>
+    $(document).ready(function() {
+      var unit = $('#unit').val();
+      $('#unit').selectize({
+        maxItems: 1,
+        persist: true
+        // onInitialize: function() {
+        //     if (unit == 'QTY') {
+        //       ("#other-unit").hide();
+        //       $('.duration-of-availability-from').val('');
+        //       $('.duration-of-availability-to').val('');
+        //     } else if (unit == 'HOUR') {
+        //       $("#other-unit").show();
+        //       $('.duration-of-availability-from').val('');
+        //       $('.duration-of-availability-to').val('');
+        //       defaultFormat();
+        //     } else if (unit == 'DAY') {
+        //       $("#other-unit").show();
+        //       $('.duration-of-availability-from').val('');
+        //       $('.duration-of-availability-to').val('');
+        //       defaultFormat();
+        //     } else if (unit == 'WEEK') {
+        //       $("#other-unit").show();
+        //       $('.duration-of-availability-from').val('');
+        //       $('.duration-of-availability-to').val('');
+        //       weekFormat();
+        //     } else if (unit == 'MONTH') {
+        //       $("#other-unit").show();
+        //       $('.duration-of-availability-from').val('');
+        //       $('.duration-of-availability-to').val('');
+        //       defaultFormat();
+        //     } else {
+        //       $("#other-unit").hide();
+        //       $('.duration-of-availability-from').val('');
+        //       $('.duration-of-availability-to').val('');
+        //     }
+        // }
+      });
+
+      $("#other-unit").hide();
+
+      $('#unit').on('change', function() {
+        switch (this.value) {
+          case 'QTY':
+            $("#other-unit").hide();
+            $('.duration-of-availability-from').val('');
+            $('.duration-of-availability-to').val('');
+            break;
+          case 'HOUR':
+            $("#other-unit").show();
+            $('.duration-of-availability-from').val('');
+            $('.duration-of-availability-to').val('');
+            defaultFormat();
+            break;
+          case 'DAY':
+            $("#other-unit").show();
+            $('.duration-of-availability-from').val('');
+            $('.duration-of-availability-to').val('');
+            defaultFormat();
+            break;
+          case 'WEEK':
+            $("#other-unit").show();
+            $('.duration-of-availability-from').val('');
+            $('.duration-of-availability-to').val('');
+            weekFormat();
+            break;
+          case 'MONTH':
+            $("#other-unit").show();
+            $('.duration-of-availability-from').val('');
+            $('.duration-of-availability-to').val('');
+            defaultFormat();
+            break;
+          default:
+            $("#other-unit").hide();
+            $('.duration-of-availability-from').val('');
+            $('.duration-of-availability-to').val('');
+            break;
+        }
+
+      });
+
+      $('#custom-availability').hide();
+      $("input[name=availability]").on('change', function(){
+        if (this.value == 'No') {
+          $('#custom-availability').show();
+        } else {
+          $('#custom-availability').hide();
+        }
+      });
+
+      $('#custom-hours-availability').hide();
+      $("input[name=retain]").on('change', function(){
+        if (this.value == 'No') {
+          $('#custom-hours-availability').show();
+        } else {
+          $('#custom-hours-availability').hide();
+        }
+      });
+
+    });
+  </script>
+
+  <script>
+
+      var weeks;
+      var datetoenable = false;
+      $(document).ready(function(){
+
+
+          $('body').on('focus',".sched-time", function(){
+            $(this).datetimepicker({
+              format: 'hh:mm A',
+            });
+          });
+
+
+
+      });
+
+      function defaultFormat() {
+        $('.duration-of-availability-from').datetimepicker({
+            format: 'DD-MM-YYYY',
+            useCurrent: false,
+        }).on('dp.change', function(e){
+
+          if (datetoenable == true) {
+            $('.duration-of-availability-to').data('DateTimePicker').destroy();
+          }
+
+          $('.duration-of-availability-to').datetimepicker({
+              format: 'DD-MM-YYYY',
+              useCurrent: false,
+          });
+
+        });
+
+      }
+
+      function weekFormat() {
+        $('.duration-of-availability-from').datetimepicker({
+            format: 'DD-MM-YYYY',
+            useCurrent: false,
+          }).on('dp.change', function(e){
+            var date = moment(e.date);
+            var dow = date.day();
+            weeks = [0, 1, 2, 3, 4, 5, 6];
+            var index = weeks.indexOf(dow);
+            if (index > -1) {
+              if (index == 0) {
+                weeks.splice(6, 1);
+              } else  {
+                weeks.splice(index-1, 1);
+              }
+            }
+            enableDateTo(weeks);
+
+          });
+      }
+
+      function enableDateTo(weeks){
+        if (datetoenable == true) {
+          $('.duration-of-availability-to').data('DateTimePicker').destroy();
+        }
+          $('.duration-of-availability-to').datetimepicker({
+            format: 'DD-MM-YYYY',
+            useCurrent: false,
+            daysOfWeekDisabled: weeks,
+          });
+          datetoenable = true;
+      };
+
+      $(function () {
+
+          $(document).on('dp.change', '.from-time', function(e){
+            var mins = $('#avail_mins_from').val();
+            var from_val = $(this).val();
+            var time = moment.utc(from_val, 'hh:mm A');
+            var value = moment(time).add(mins, 'minutes');
+            $(e.target).closest('.input-group').find('.to-time').val(value.format('hh:mm A'));
+          });
+
+          $(document).on('click', '#add-hours', function(e){
+            e.preventDefault();
+            $('.app').append('<span class="input-group additional" style="margin-bottom: 10px;">' +
+                                '<span>From </span>' +
+                                '{{ resource_form.sched_time_from(class="form-control3 sched-time from-time", placeholder="00:00", value="") }} ' +
+                                '<span> To </span>' +
+                                ' {{ resource_form.sched_time_to(class="form-control3 sched-time to-time", placeholder="00:00", value="") }} ' +
+                                '<i class="fa fa-lg fa-remove remove-add"></i>' +
+                                '<br>' +
+                              '</span>');
+          });
+
+          // $(document).on('dp.update', '.to-time', function(e){
+          //   var mins = $('#avail_mins_to').val();
+          //   var from_val = $(this).val();
+          //   var time = moment.utc(from_val, 'hh:mm A');
+          //   var value = moment(time).add(mins, 'minutes');
+          //   $(e.target).closest('.input-group').find('.from-time').val(value.format('hh:mm A'));
+          // });
+
+          $(document).on("click",".remove-add", function(e){ //user click on remove text
+            e.preventDefault();
+            $(this).closest('.additional').remove();
+          });
+
+          // Day checkbox
+          $("#select_all").change(function(){  //"select all" change
+              $(".checkbox-day").prop('checked', $(this).prop("checked")); //change all ".checkbox-day" checked status
+          });
+
+          //".checkbox-day" change
+          $('.checkbox-day').change(function(){
+              //uncheck "select all", if one of the listed checkbox item is unchecked
+              if(false == $(this).prop("checked")){ //if this item is unchecked
+                  $("#select_all").prop('checked', false); //change "select all" checked status to false
+              }
+              //check "select all" if all checkbox items are checked
+              if ($('.checkbox-day:checked').length == $('.checkbox-day').length ){
+                  $("#select_all").prop('checked', true);
+              }
+          });
+
+
+
+      });
+  </script>
+
+  <script>
+    function clear(){
+      $('#minutes').val('');
+      $('.from-time').val('');
+      $('.to-time').val('');
+    }
+  </script>
+
+  <script>
+    function checkLength(len,ele){
+      var fieldLength = ele.value.length;
+      if(fieldLength <= len){
+        return true;
+      }
+      else
+      {
+        var str = ele.value;
+        str = str.substring(0, str.length - 1);
+        ele.value = str;
+      }
+    }
+  </script> -->
+{% endblock %}

@@ -1,0 +1,167 @@
+{% extends "layouts/main.html" %}
+{% block body %}
+  {# start main body #}
+  <div class="container sub-banner" id="transactions">
+    <div class="row">
+      {# start sidebar #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Messages</h4>
+          {# <p><i>Inbox</i></p> #}
+          <ul class="list-unstyled">
+            <li><a class="active_category" href="{{ url_for('UserBP.view_message_list') }}">Inbox</a></li>
+            <li><a href="{{ url_for('UserBP.archived_message_list') }}">Archive</a></li>
+          </ul>
+        </div>
+      </div> {# end sidebar #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        {# start breadcrumbs #}
+        <div class="col-lg-12">
+          <div class="row">
+            <div class="col-sm-4">
+              <h5 class="center-page-header">Inbox</h5>
+            </div>
+          </div>
+          <hr class="header-line">
+        </div> {# end breadcrumbs #}
+
+        <div class="col-lg-12">
+          <ol class="breadcrumb">
+            <li><a href="{{ url_for('UserBP.home_page') }}">Home</a></li>
+            <li class="active">Inbox</li>
+          </ol>
+        </div>
+
+        {% if messages|length == 0 %}
+
+        <div class="blank-page">
+          <div class="empty-box text-left">
+            <p style="font-weight: bold; font-size: 15px; margin-top: 100px; margin-left: 15px;"><span>You don't have any transactions at the moment.</span></p>
+            <p style="font-size: 25px; margin-top: 10px; font-weight: bold; margin-left: 15px;"><span><i>Start browsing now!</i></span></p>
+            <p style="margin-left: 15px;" class="btn-horizontal-list"><a class="btn btn-primary" href="{{ url_for('UserBP.home_page') }}"><span>Browse Resources</span></a></p>
+          </div>
+        </div>
+
+        {% else %}
+
+        {# start message list #}
+        <div class="col-lg-12">
+          {% for message in messages %}
+            {% if message.unread_message_count >= 1 %}
+            <div class="transaction-row">
+            {% else %}
+            <div class="transaction-row" style="background-color: #FFFFFF">
+            {% endif %}
+              <a href="{{ url_for('UserBP.message_thread', message_id=message.id) }}" class="inherit-link">
+                <div class="row">
+                  {% for participant in message.participants %}
+                    {% if participant.account_id != current_user.id %}
+                      <div class="col-sm-4 col-xs-2 transaction-profile">
+                        <div class="media">
+                          <div class="media-left">
+                            <div class="transaction-avatar">
+                              <img src="{{ participant.account_image_url }}" alt="">
+                            </div>
+                          </div>
+                          <div class="media-body">
+                            <div class="text-small">
+                            {% if message.unread_message_count >= 1 %}
+                              <b>{{ participant.account_name }}
+
+                              ({{ message.unread_message_count }})</b>
+                            {% else %}
+                              {{ participant.account_name }}
+                            {% endif %}
+                            </div>
+                            <div class="text-smaller text-muted">
+                              <span>
+                                {% if message.last_message is defined %}
+                                  {{ message.last_message.date_created.strftime('%d %B, %Y %H:%M') }}
+                                {% else %}
+                                  {{ message.date_created.strftime('%d %B, %Y %H:%M') }}
+                                {% endif %}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+
+                  <div class="col-sm-8 col-xs-10">
+                    <div class="transaction-description">
+                      <div class="text-bold ellipsis">{{ message.resource.name }}</div>
+                      <div class="text-small">S${{ message.resource.price }}</div>
+                      <div>
+                        {% if message.last_message is defined %}
+                          {% if message.last_message.author_id == current_user.id %}
+                          <span class="text-smaller text-muted">
+                            <p class="ellipsis">You: {{ message.last_message.message }}</p></span>
+                          {% else %}
+                          <span class="text-smaller text-muted">
+                          <p class="ellipsis">{{ message.last_message.account_name }}: {{ message.last_message.message }}</p></span>
+                          {% endif %}
+                        {% else %}
+                        <span class="text-smaller text-muted">Booked Resources</span>
+                        {% endif %}
+                      </div>
+                      <div class="transaction-icon-img">
+                        <img src="{{ message.resource.image_url or 'http://placehold.it/400x400/000/fff' }}" alt="" class="transaction-product-img">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+          {% endfor %}
+        </div> {# end message list #}
+        {% endif %}
+
+        {# start pagination #}
+        <div class="row text-center">
+          <nav aria-label="Page navigation">
+            <ul class="pagination">
+              {% if pagination.has_prev %}
+                <li>
+                  <a href="{{ url_for('UserBP.view_message_list', page=page|int - 1) }}" aria-label="Next">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+              {% else %}
+                <li class="disabled">
+                  <span>
+                    <span aria-hidden="true">&laquo;</span>
+                  </span>
+                </li>
+              {% endif %}
+              {% for page in pagination.iter_pages() %}
+                {% if page == pagination.page %}
+                  <li class="active"><a href="{{ url_for('UserBP.view_message_list', page=page) }}">{{ page }}</a></li>
+                {% else %}
+                  <li><a href="{{ url_for('UserBP.view_message_list', page=page) }}">{{ page }}</a></li>
+                {% endif %}
+              {% endfor %}
+
+              {% if pagination.has_next %}
+                <li>
+                  <a href="{{ url_for('UserBP.view_message_list', page=page|int + 1) }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+              {% else %}
+                <li class="disabled">
+                  <span>
+                    <span aria-hidden="true">&raquo;</span>
+                  </span>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div> {# end pagination #}
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock %}

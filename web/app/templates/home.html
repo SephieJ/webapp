@@ -1,0 +1,359 @@
+{% extends "layouts/main.html" %}
+{% block head %}
+  <link href="{{ url_for('static', filename='assets/css/swiper.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='assets/css/selectize.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='assets/css/selectize.default.css') }}" rel="stylesheet">
+  <script>
+     var local_url = window.location.toString();
+     if(local_url.indexOf("resourcestoshare.com") != -1)
+     {
+	 //window.location = 'https://resourcestoshare.com/prelaunch';
+
+     }
+  </script>
+{% endblock %}
+
+{% block body %}
+  {# start page header #}
+  <div class="container-fluid no-padding">
+    <div class="row">
+      <div class="col-lg-12 banner">
+        <div class="swiper-container">
+          <div class="swiper-wrapper">
+          {% if current_user.is_authenticated %}
+            <div class="swiper-slide"><a href="{{ url_for ('CategoryBP.view_category_page', category_id=5) }}"><img src="{{ url_for('static', filename='assets/img/R2S-Banner-Homepage-01.jpg') }}" alt="" class="img-responsive"></a></div>
+            <div class="swiper-slide"><a href="{{ url_for('CompanyBP.contest_page') }}"><img src="{{ url_for('static', filename='assets/img/R2S-Banner-Homepage-2.jpg') }}" alt="" class="img-responsive"></a></div>
+            <!-- <div class="swiper-slide"><a href="{{ url_for ('CategoryBP.view_category_page', category_id=7) }}"><img src="{{ url_for('static', filename='assets/img/R2S-Portal-Banner-3_Collaborate.jpg') }}" alt="" class="img-responsive"></a></div> -->
+            <div class="swiper-slide"><a href="{{ url_for ('CategoryBP.view_category_page', category_id=3) }}"><img src="{{ url_for('static', filename='assets/img/R2S-Banner-Homepage-3.jpg') }}" alt="" class="img-responsive"></a></div>
+            <!-- <div class="swiper-slide"><a href="{{ url_for('CompanyBP.about_us_page') }}"><img src="{{ url_for('static', filename='assets/img/R2S-Portal-Banner-5_Resources.jpg') }}" alt="" class="img-responsive"></a></div> -->
+          {% else %}
+            <div class="swiper-slide"><a href="{{ url_for('UserBP.register_page') }}"><img src="{{ url_for('static', filename='assets/img/R2S-Banner-Homepage-1.jpg') }}" alt="" class="img-responsive"></a></div>
+            <div class="swiper-slide"><a href="{{ url_for('CompanyBP.contest_page') }}"><img src="{{ url_for('static', filename='assets/img/R2S-Banner-Homepage-2.jpg') }}" alt="" class="img-responsive"></a></div>
+            <!-- <div class="swiper-slide"><a href="{{ url_for ('CategoryBP.view_category_page', category_id=7) }}"><img src="{{ url_for('static', filename='assets/img/R2S-Portal-Banner-3_Collaborate.jpg') }}" alt="" class="img-responsive"></a></div> -->
+            <div class="swiper-slide"><a href="{{ url_for ('CategoryBP.view_category_page', category_id=3) }}"><img src="{{ url_for('static', filename='assets/img/R2S-Banner-Homepage-3.jpg') }}" alt="" class="img-responsive"></a></div>
+            <!-- <div class="swiper-slide"><a href="{{ url_for('CompanyBP.about_us_page') }}"><img src="{{ url_for('static', filename='assets/img/R2S-Portal-Banner-5_Resources.jpg') }}" alt="" class="img-responsive"></a></div> -->
+          {% endif %}
+          </div>
+
+          <!-- Add Pagination -->
+          <div class="swiper-pagination"></div>
+          <!-- Add Arrows -->
+          <!-- <div class="swiper-button-next swiper-button-white"></div>
+          <div class="swiper-button-prev swiper-button-white"></div> -->
+
+        </div>
+
+      </div>
+    </div>
+  </div> {# end page header #}
+
+  {# start main body #}
+  <div class="container" id="content">
+    <div class="row">
+      {# start sidebar category #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Category</h4>
+
+          <div class="form-group">
+            <select name="categories" id="categories" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);" multiple="multiple" data-placeholder="Search" style="width:100%;" tabindex="5">
+              {% for category in categories %}
+                <optgroup id="{{ category.name|safe }}">
+                    <option value="{{base_url}}/categories/{{ category.id }}">
+                      {{ category.name|safe }}
+                    </option>
+                </optgroup>
+              {% endfor %}
+            </select>
+            <div class="help-block with-errors"></div>
+          </div>
+
+          <input id="scrollup" type="image" width="170" height="20" name="scroll_up" src="{{ url_for('static', filename='assets/img/scrollup.png') }}">
+            <ul id="box" class="list-unstyled" style="height: 340px; overflow: hidden;">
+              {% for category in categories %}
+                <li class="ellipsis" id="{{ category.name|safe }}">
+                  <a id="category_name" href="{{ url_for ('CategoryBP.view_category_page', category_id=category.id) }}">
+                    {{ category.name|safe }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          <input id="scrolldown" type="image" width="170" height="20" name="scroll_down" src="{{ url_for('static', filename='assets/img/scrolldown.png') }}">
+
+          {% if current_user.is_authenticated %}
+          <br>
+          <h4>Wished Resources</h4>
+          <ul class="list-unstyled" style="height: 300px; overflow: auto;">
+            {% for wishlist in wishlists %}
+              <li>
+                <li><a href="{{ url_for('ResourceBP.view_wishlist_page', slug=wishlist.reference) }}">{{ wishlist.name }}</a></li>
+              </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          {% endif %}
+        </div>
+      </div> {# end sidebar category #}
+
+      {# start center page #}
+      <div id="ajaxpage" class="col-lg-10 col-md-10 center-page">
+        {# start filter form #}
+        <form role="form" method="GET" action="{{ url_for('UserBP.home_page')}}">
+          <div class="col-lg-12" id="item-filter">
+            <ul class="nav nav-pills">
+              <li class="item-sort">
+                <div class="form-group">
+                  <label for="">Sort:</label>
+                  <select class="form-control btn-wrap" id="sort" name="sort" onchange="this.form.submit()">
+                    {% if sorting == 'recent' %}
+                      <option value="recent" selected="selected">Recent</option>
+                    {% else %}
+                      <option value="recent">Recent</option>
+                    {% endif %}
+
+                    {% if sorting == 'highest_price' %}
+                      <option value="highest_price" selected="selected">Highest Price</option>
+                    {% else %}
+                      <option value="highest_price">Highest Price</option>
+                    {% endif %}
+
+                    {% if sorting == 'lowest_price' %}
+                    <option value="lowest_price" selected="selected">Lowest Price</option>
+                    {% else %}
+                    <option value="lowest_price">Lowest Price</option>
+                    {% endif %}
+                  </select>
+                </div>
+              </li>
+
+              <li class="item-sort">
+                <label for="">&nbsp;</label>
+                <div class="dropdown dropdown-filters">
+                  <button class="btn btn-default dropdown-toggle btn-sm btn-wrap" type="button" id="dropdownFilter" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    More Filters
+                    <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="dropdownFilter">
+                    <li>
+                      <div class="form-group">
+                        <label for="">Minimum Price</label>
+                        <input class="form-control" id="min_price" name="min_price" type="number" min="1" value="{{ min_price or '' }}">
+                      </div>
+                      <div class="form-group">
+                        <label for="">Maximum Price</label>
+                        <input class="form-control" id="max_price" name="max_price" type="number" min="1" value="{{ max_price or '' }}">
+                      </div>
+                    </li>
+                    <li>
+                      <button type="submit" class="btn btn-info btn-group-justified">Filter</button>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </form> {# end filter form #}
+
+        {% for resource in resources %}
+          {% include 'layouts/resource_item.html' %}
+        {% endfor %}
+
+        <div class="clearfix"></div>
+        {# start pagination #}
+        <div class="row text-center">
+          <nav aria-label="Page navigation">
+            <ul class="pagination">
+              {% if pagination.has_prev %}
+                <li>
+                  <a href="{{ url_for('UserBP.home_page', page=page|int - 1) }}" aria-label="Next">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+              {% else %}
+                <li class="disabled">
+                  <span>
+                    <span aria-hidden="true">&laquo;</span>
+                  </span>
+                </li>
+              {% endif %}
+              {% for page in pagination.iter_pages() %}
+                {% if page == pagination.page %}
+                  <li class="active"><a href="{{ url_for('UserBP.home_page', page=page) }}">{{ page }}</a></li>
+                {% elif page == '...' %}
+                  <li><a onclick="javascript: return false;">{{ page }}</a></li>
+                {% else %}
+                  <li><a href="{{ url_for('UserBP.home_page', page=page) }}">{{ page }}</a></li>
+                {% endif %}
+              {% endfor %}
+
+              {% if pagination.has_next %}
+                <li>
+                  <a href="{{ url_for('UserBP.home_page', page=page|int + 1) }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+              {% else %}
+                <li class="disabled">
+                  <span>
+                    <span aria-hidden="true">&raquo;</span>
+                  </span>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div> {# end pagination #}
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock %}
+
+{% block lib_javascript %}
+  <script src="{{ url_for('static', filename='assets/js/swiper.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/selectize.min.js') }}"></script>
+  <!-- <script src="{{ url_for('static', filename='assets/js/cropper.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/cropper-main.js') }}"></script> -->
+  <script src="{{ url_for('static', filename='assets/js/jquery.validate.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/additional-methods.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/selectize_no_result_plugin.js') }}"></script>
+{% endblock %}
+
+{% block custom_javascript %}
+  {# Init Swiper #}
+  <script>
+    var swiper = new Swiper('.swiper-container', {
+        pagination: '.swiper-pagination',
+        // nextButton: '.swiper-button-next',
+        // prevButton: '.swiper-button-prev',
+        slidesPerView: 1,
+        paginationClickable: true,
+        spaceBetween: 30,
+        autoplay: 7000,
+        autoplayDisableOnInteraction: false,
+        centeredSlides: true,
+        loop: true,
+        effect: 'fade'
+
+    });
+  </script>
+
+  {# Favorite icon #}
+  <script>
+    $(function(){
+      $('.thumbnail').on('mouseover', function(){
+          $(this).find('.rs-card-like').css('display','block');
+      });
+      $('.thumbnail').on('mouseleave', function(){
+          $(this).find('.rs-card-like').css('display','none');
+      });
+    });
+  </script>
+
+ <!--  <script>
+        //When the page has loaded.
+    $(document).ready(function(){
+        //Perform Ajax request.
+        home_url = '/homepage'
+        $.ajax({
+            url: home_url,
+            type: 'GET',
+            datatype: 'json'
+            success: function(data){
+                //If the success function is execute,
+                //then the Ajax request was successful.
+                //Add the data we received in our Ajax
+                //request to the "content" div.
+                $('#ajaxpage').html(data);
+
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                var errorMsg = 'Ajax request failed: ' + xhr.responseText;
+                $('#ajaxpage').html(errorMsg);
+              }
+        });
+    });
+  </script> -->
+
+  {# Ajax call to mark favorites #}
+  <script>
+    $(document).ready(function() {
+      var favorites_url = '{{ base_url }}' + "/favorites";
+
+      $(".bookmark-border").click(function() {
+        var resource_id = $(this).data('id');
+        var fave_url = '/resources/' + resource_id + '/favorites';
+        var dis = $(this);
+        $.ajax({
+          url: fave_url,
+          datatype: 'json',
+          type: 'GET',
+          success: function(data) {
+            if (data["message"] == "Successfully updated") {
+              $('#bookmark-fill-' + resource_id).removeClass("rs-card-like");
+              $('#bookmark-fill-' + resource_id).addClass("user-rs-card-like");
+              dis.parent().find("i.fa-bookmark").css("color", "#f97106");
+              console.log("Added");
+
+            } else if (data["message"] == "Successfully removed") {
+              $('#bookmark-fill-' + resource_id).removeClass("user-rs-card-like");
+              $('#bookmark-fill-' + resource_id).addClass("rs-card-like");
+              dis.parent().find("i.fa-bookmark").css("color", "rgba(0, 0, 0, 0.2)");
+              console.log("Removed");
+
+            }
+          },
+          error: function(error) {
+              console.log(error);
+          }
+        });
+      });
+    });
+  </script>
+
+  <!-- Others must be on Last -->
+  <script type="text/javascript">
+    $(document).ready(function(){
+
+      $("#categories > optgroup").filter(function(){
+        return this.id == "Others";
+      }).insertAfter("#categories > optgroup:last");
+
+      $("#box > li").filter(function(){
+        return this.id == "Others";
+      }).insertAfter($("#box > li:last"));
+
+    });
+  </script>
+
+
+  {# Search Categories #}
+  <script type="text/javascript">
+    // document.ready
+    $( document ).ready(function() {
+      $("#parent_category").hide();
+      $("#parent_category_label").hide();
+      $("#subcategory").hide();
+      $("#subcategory_label").hide();
+      initCategorySel();
+    });
+
+    // init category selectize
+    function initCategorySel() {
+        $('#categories').selectize({
+          plugins: ['remove_button', 'restore_on_backspace', 'no_results'],
+          maxItems: 1,
+          onChange: function(value) {
+            if(value !== null) {
+              $("#categories-error").hide();
+            } else {
+              $("#categories-error").show();
+            }
+          }
+        });
+      }
+
+  </script>
+
+
+
+{% endblock %}

@@ -1,0 +1,222 @@
+{% extends "layouts/main.html" %}
+{% block head %}
+  <link href="{{ url_for('static', filename='assets/css/rateyo.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='assets/css/selectize.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='assets/css/selectize.default.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+  {# start main body #}
+  <div class="container" id="profile">
+    <div class="row">
+      {# start sidebar #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Profile</h4>
+          <ul class="list-unstyled">
+            <li><a href="{{ url_for ('UserBP.user_profile_page', user_id=current_user.id) }}">My Profile</a></li>
+            <li><a class="active_category" href="{{ url_for ('UserBP.user_edit_profile') }}">Edit Profile</a></li>
+            <li><a href="{{ url_for ('UserBP.user_change_password') }}">Change Password</a></li>
+          </ul>
+        </div>
+      </div> {# end sidebar #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        <div class="col-lg-12">
+          <h5 class="center-page-header pull-right"><a href="{{ url_for ('UserBP.user_edit_profile') }}">Edit Profile</a></h5>
+          <h5 class="center-page-header">Company Details</h5>
+          <hr class="header-line">
+          <p style="color: red; padding-top: 10px;">Only pioneer user can update company profile</p>
+        </div>
+
+      <div class="wrap-profile">
+            <form role="form" action="{{ url_for('UserBP.user_company_page', company_id=company_details.id) }}" method="POST" files=true enctype="multipart/form-data" name="edit_company" id="edit_company">
+            {{ company_form.csrf_token }}
+
+              <div class="col-lg-3">
+                <div class="profile-info">
+                  <div class="profile-avatar">
+                    <label class="settings-profile-avatar" >
+                      {% if company_details.image_url %}
+                        <img id="profilepic" src="{{ company_details.image_url }}" alt="" class="center-block img-rounded">
+                      {% else %}
+                        <img id="profilepic" src="{{ url_for('static', filename='assets/img/building.png') }}" alt="" class="center-block img-rounded">
+                      {% endif %}
+                    </label>
+                  </div>
+
+
+                  <h4>{{ company_details.name|safe }}</h4>
+                  <div class="text-muted">
+                    Joined {{ company_details.created_date.strftime('%b %Y') }}
+                  </div>
+                  <div class="text-muted email">
+
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-9" style="margin-top: 20px;">
+                  <div class="col-md-12">
+                      <h5><b>Description</b></h5>
+                      <div class="form-group">
+                        <span>{{ company_details.description or 'N.A.' }}</span>
+                      </div>
+
+                      <div class="row" style="padding-bottom: 20px;">
+                        <div class="col-sm-6" style="margin-top: 70px;">
+                          <h5><b>Business Registration Number</b></h5>
+                          <div class="form-group">
+                            <span>{{ company_details.business_reg_number }}</span>
+                          </div>
+
+                          <h5><b>Office Number</b></h5>
+                          <div class="form-group">
+                            <span>{{ company_details.office_number or 'N.A.' }}</span>
+                          </div>
+
+                          <h5><b>Company Address</b></h5>
+                          <div class="form-group">
+                            {% if company_details.address.unit_number %}
+                              <span>UNIT {{ company_details.address.unit_number }} {{ company_details.address.block_street }}</span>
+                            {% else %}
+                              <span>{{ company_details.address.block_street }}</span>
+                            {% endif %}
+                          </div>
+                          <br>
+
+                          <h5><b>Website</b></h5>
+                          <div class="form-group">
+                            <span>
+                            <a href="{{company_details.website or '#'}}">{{ company_details.website or 'N.A.' }}</a>
+                            </span>
+                          </div>
+
+                          <h5><b>Facebook</b></h5>
+                          <div class="form-group">
+                            <span>
+                            <a href="{{company_details.facebook or '#'}}">{{ company_details.facebook or 'N.A.' }}</a>
+                            </span>
+                          </div>
+
+                          <h5><b>LinkedIn</b></h5>
+                          <div class="form-group">
+                            <span>
+                            <a href="{{ company_details.linkedin or '#'}}">{{ company_details.linkedin or 'N.A.'}}</a>
+                            </span>
+                          </div>
+
+                        </div>
+
+                        <div class="col-sm-5 col-sm-offset-1" style="margin-top: 70px;">
+
+                          <h5><b>Industry</b></h5>
+                          <div class="form-group">
+                            <span>{{ company_details.primaryIndustry }}</span>
+                          </div>
+
+                          <h5><b>Size (Employees)</b></h5>
+                          <div class="form-group">
+                            {% if company_details.company_size == 'LT10' %}
+                              <span>Less than 10</span>
+                            {% elif company_details.company_size == 'TTOF' %}
+                              <span>10 to 50</span>
+                            {% elif company_details.company_size == 'F1TO1H' %}
+                              <span>51 to 100</span>
+                            {% elif company_details.company_size == 'H1TO2H' %}
+                              <span>101 to 200</span>
+                            {% elif company_details.company_size == 'GT2H' %}
+                              <span>Greater than 200</span>
+                            {% else %}
+                              <span>N.A.</span>
+                            {% endif %}
+                          </div>
+
+                          <h5><b>Revenue</b></h5>
+                          <div class="form-group">
+                            {% if company_details.company_revenue == 'LTONEM' %}
+                              <span>Less than $1Million</span>
+                            {% elif company_details.company_revenue == 'ONEMTOTENM' %}
+                              <span>$1 - $10Million</span>
+                            {% elif company_details.company_revenue == 'ELEVENMTO1HM' %}
+                              <span>$11 - $100Million</span>
+                            {% elif company_details.company_revenue == 'GT1HM' %}
+                              <span>Greater than $100Million</span>
+                            {% else %}
+                              <span>N.A.</span>
+                            {% endif %}
+                          </div>
+
+                          <h5><b>Years of Incorporation</b></h5>
+                          <div class="form-group">
+                            {% if company_details.years_of_incorporation == 'LT2Y' %}
+                              <span>Less than 2 years</span>
+                            {% elif company_details.years_of_incorporation == 'TTOFY' %}
+                              <span>3 to 5 years</span>
+                            {% elif company_details.years_of_incorporation == 'STO10Y' %}
+                              <span>6 - 10 years</span>
+                            {% elif company_details.years_of_incorporation == 'GT10Y' %}
+                              <span>Greater than 10 years</span>
+                            {% else %}
+                              <span>N.A.</span>
+                            {% endif %}
+                          </div>
+                          <br>
+
+
+                          <h5><b>BCA</b></h5>
+                          <div class="form-group">
+                            {% for bca in company_details.bca %}
+                                <span>{{ bca }}</span>
+                                <br>
+                            {% endfor %}
+                          </div>
+
+                          <h5><b>ISO</b></h5>
+                          <div class="form-group">
+                            {% for iso in company_details.iso %}
+                                <span>{{ iso }}</span>
+                                <br>
+                            {% endfor %}
+                          </div>
+
+                          <h5><b>BizSafe</b></h5>
+                          <div class="form-group">
+                            {% if company_details.bizsafe == 'LEVEL1' %}
+                              <span>Level 1</span>
+                            {% elif company_details.bizsafe == 'LEVEL2' %}
+                              <span>Level 2</span>
+                            {% elif company_details.bizsafe == 'LEVEL3' %}
+                              <span>Level 3</span>
+                            {% elif company_details.bizsafe == 'LEVEL4' %}
+                              <span>Level 4</span>
+                            {% elif company_details.bizsafe == 'LEVELSTAR' %}
+                              <span>Level Star</span>
+                            {% else %}
+                              <span>N.A.</span>
+                            {% endif %}
+                          </div>
+
+                        </div>
+                      </div>
+                  </div>
+
+              </div>
+              </form>
+            </div>
+      </div> {# end center page #}
+
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock %}
+
+{% block lib_javascript %}
+  <script src="{{ url_for('static', filename='assets/js/daterangepicker.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/jquery.validate.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/additional-methods.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/selectize.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/jquery.validate.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/selectize_no_result_plugin.js') }}"></script>
+{% endblock %}

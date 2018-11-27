@@ -1,0 +1,127 @@
+{% extends "layouts/main.html" %}
+{% block body %}
+<style type="text/css">
+  a.inactive {
+    border:0;
+    background:0;
+}
+</style>
+  <div class="container sub-banner" id="transactions">
+    <div class="row">
+      {# start sidebar #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Transactions</h4>
+          <p><i>My Records</i></p>
+          <ul class="list-unstyled">
+            <li>
+              {% if transaction_type == 'selling' %}
+                <a class="active_category" href="{{ url_for ('UserTransactionBP.view_selling_transactions_page') }}">Resources to Share</a>
+              {% else %}
+                <a href="{{ url_for ('UserTransactionBP.view_selling_transactions_page') }}">Resources to Share</a>
+              {% endif %}
+            </li>
+            <li>
+              {% if transaction_type == 'buying' %}
+                <a class="active_category" href="{{ url_for ('UserTransactionBP.view_buying_transactions_page') }}">Resources Needed</a>
+              {% else %}
+                <a href="{{ url_for ('UserTransactionBP.view_buying_transactions_page') }}">Resources Needed</a>
+              {% endif %}
+            </li>
+          </ul>
+        </div>
+      </div> {# end sidebar #}
+
+
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        {# start title #}
+        <div class="col-lg-12">
+          <div class="row">
+            Documentations
+          </div>
+          <hr class="header-line">
+        </div> {# end title #}
+        <div class="blank-page">
+                <h1>Hello World</h1>
+        </div>
+
+      </div> {# end center page #}
+    </div>
+  </div>
+{% endblock %}
+
+{% block custom_javascript %}
+  <script>
+  $(function(){
+    $('.nav-tabs a').click(function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+      var scrollmem = $('body').scrollTop() || $('html').scrollTop();
+      var str = this.hash;
+      var rep = str.replace("#", "");
+      window.history.pushState(null, null, rep);
+      $('html,body').scrollTop(scrollmem);
+    });
+  });
+
+
+  </script>
+
+  <!-- <script>
+    var url = window.location;
+
+    $('ul.nav a[href="'+ url +'"]').parent().addClass('active_category');
+
+    $('ul.nav a').filter(function() {
+        return this.href == url;
+    }).parent().addClass('active_category');
+  </script> -->
+
+  <script>
+    $(document).ready(function(){
+      $('ul li a').click(function(){
+        $('li a').removeClass("active_category");
+        $(this).addClass("active_category");
+      });
+    });
+  </script>
+
+  <script>
+    window.aDataRate = null;
+    $(function(){
+
+      $(".rate-yo").rateYo({
+          starWidth:"20px",
+          // halfStar: false,
+          precision: 0,
+        })
+
+        .on("rateyo.set", function (e, data) {
+            // alert("The rating is set to " + data.rating + "!");
+            var transaction_id = $('.rate-yo').data('id');
+            var rating = data.rating;
+            aDataRate = {
+              transaction_id : $('.rate-yo').data('id'),
+              rating         : data.rating
+            };
+
+            $("div[name='Rate']").modal('show');
+      });
+
+    });
+
+    function rateItem(aArg){
+        $("div[name='Rate']").modal('hide');
+        $.ajax({
+          type: 'GET',
+          url: '/transactions/' + aDataRate.transaction_id + '/rate',
+          data: {"rating": aDataRate.rating , "message" : $("textarea#sMessageRatings").val() },
+          success: function(data) {
+            location.reload();
+          }
+        });
+    }
+  </script>
+{% endblock %}

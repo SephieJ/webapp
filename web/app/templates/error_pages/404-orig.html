@@ -1,0 +1,6 @@
+{% extends "layouts/blank.html" %}
+{% block body %}
+  <div class="error-page">404</div>
+  <div class="error-page-body">Page not found.</div>
+  <div class="error-page-link">Back to <a href="{{ url_for('UserBP.home_page') }}">Home.</a></div>
+{% endblock %}

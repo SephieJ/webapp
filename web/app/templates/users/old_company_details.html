@@ -1,0 +1,338 @@
+{% extends "layouts/main.html" %}
+{% block head %}
+  <link href="{{ url_for('static', filename='assets/css/rateyo.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+  {# start main body #}
+  <div class="container" id="profile">
+    <div class="row">
+      {# start sidebar #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Profile</h4>
+          <ul class="list-unstyled">
+            <li><a href="{{ url_for ('UserBP.user_profile_page', user_id=current_user.id) }}">My Profile</a></li>
+            <li><a class="active_category" href="{{ url_for ('UserBP.user_edit_profile') }}">Edit Profile</a></li>
+            <li><a href="{{ url_for ('UserBP.user_change_password') }}">Change Password</a></li>
+          </ul>
+        </div>
+      </div> {# end sidebar #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        <div class="col-lg-12">
+          <h5 class="center-page-header pull-right"><a href="{{ url_for ('UserBP.user_edit_profile') }}">Edit Profile</a></h5>
+          <h5 class="center-page-header">Company Details</h5>
+          <hr class="header-line">
+        </div>
+
+
+      <form role="form" action="{{ url_for('UserBP.user_company_page', company_id=company_details.id) }}" method="POST" files=true enctype="multipart/form-data" name="edit_company" id="edit_company">
+      {{ company_form.csrf_token }}
+        <div class="col-md-6 settings-content">
+            <a href="#" id="imgclick">
+              <div class="profile-avatar">
+                <label class="settings-profile-avatar" >
+                  {% if company_details.image_url %}
+                    <img id="profilepic" src="{{ company_details.image_url }}" alt="" class="center-block img-rounded">
+                  {% else %}
+                    <img id="profilepic" src="{{ url_for('static', filename='assets/img/building.png') }}" alt="" class="center-block img-rounded">
+                  {% endif %}
+                  <div class="profile-avatar-link">
+                      <i class="fa fa-camera" aria-hidden="true"></i>
+                  </div>
+                </label>
+              </div>
+            </a>
+            {{ company_form.image_url(id="imgupload", class="form-control", style="display:none;") }}
+            <div class="text-center small"><em>maximum of 2MB.</em></div>
+            <div class="text-center small"><em>Available formats (.JPG, .JPEG, .PNG)</em></div>
+            <div>
+              {% with messages = get_flashed_messages(category_filter=['profile']) %}
+              <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+              {% if messages %}
+                {% for message in messages %}
+                    {% set msg = message.split(';') %}
+                    <div class="alert alert-flash alert-{{ msg[1] }} alert-dismissible" role="alert" style="margin-top: 10px;">
+                      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      <!-- <strong>Title</strong> --> {{ msg[0] }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+              {% endwith %}
+            </div>
+
+            <div class="form-group">
+              <label for="name"><span class="text-red">*</span>Company Name</label>
+              {{ company_form.name(class="form-control", value=company_details.name) }}
+
+              <div class="help-block with-errors"></div>
+                {% if company_form.name.errors %}
+                    {% for error in company_form.name.errors %}
+                        <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="business_reg_number"><span class="text-red">*</span>Business Registration Number</label>
+              {{ company_form.business_reg_number(class="form-control", value=company_details.business_reg_number, readonly=readonly) }}
+              <div class="help-block with-errors"></div>
+                {% if company_form.business_reg_number.errors %}
+                    {% for error in company_form.business_reg_number.errors %}
+                        <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="office_number"><span class="text-red">*</span>Office Number</label>
+              {% if company_details.office_number %}
+                {{ company_form.office_number(class="form-control", value=company_details.office_number) }}
+              {% else %}
+                {{ company_form.office_number(class="form-control", placeholder="Office Number") }}
+              {% endif %}
+
+              <div class="help-block with-errors"></div>
+                {% if company_form.office_number.errors %}
+                    {% for error in company_form.office_number.errors %}
+                        <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="mobile_number"><span class="text-red">*</span>Mobile Number</label>
+              {% if company_details.mobile_number %}
+                {{ company_form.mobile_number(class="form-control", value=company_details.mobile_number) }}
+              {% else %}
+                {{ company_form.mobile_number(class="form-control", placeholder="Mobile Number") }}
+              {% endif %}
+
+              <div class="help-block with-errors"></div>
+                {% if company_form.mobile_number.errors %}
+                    {% for error in company_form.mobile_number.errors %}
+                        <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+
+            <div class="form-group">
+              <label for="company_address"><i>Company Address</i></label>
+            </div>
+
+            {% if company_details.address %}
+
+            <div class="form-group">
+              <label for="block_street"><span class="text-red">*</span>Block Street</label>
+              {{ company_form.block_street(class="form-control", value=company_details.address.block_street) }}
+              <div class="help-block with-errors"></div>
+                {% if company_form.block_street.errors %}
+                    {% for error in company_form.block_street.errors %}
+                        <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="postal_code"><span class="text-red">*</span>Postal Code</label>
+              {{ company_form.postal_code(class="form-control", value=company_details.address.postal_code) }}
+              <div class="help-block with-errors"></div>
+                {% if company_form.postal_code.errors %}
+                    {% for error in company_form.postal_code.errors %}
+                        <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="latitude"><span class="text-red">*</span>Latitude</label>
+              {{ company_form.latitude(class="form-control", value=company_details.address.latitude) }}
+              <div class="help-block with-errors"></div>
+                {% if company_form.latitude.errors %}
+                    {% for error in company_form.latitude.errors %}
+                        <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="longitude"><span class="text-red">*</span>Longitude</label>
+              {{ company_form.longitude(class="form-control", value=company_details.address.longitude) }}
+              <div class="help-block with-errors"></div>
+                {% if company_form.longitude.errors %}
+                    {% for error in company_form.longitude.errors %}
+                        <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            {% else %}
+
+            <div class="form-group">
+              <label for="block_street"><span class="text-red">*</span>Block Street</label>
+              {{ company_form.block_street(class="form-control", placeholder="Block Street") }}
+              <div class="help-block with-errors"></div>
+                {% if company_form.block_street.errors %}
+                    {% for error in company_form.block_street.errors %}
+                        <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="postal_code"><span class="text-red">*</span>Postal Code</label>
+              {{ company_form.postal_code(class="form-control", placeholder="Postal Code") }}
+              <div class="help-block with-errors"></div>
+                {% if company_form.postal_code.errors %}
+                    {% for error in company_form.postal_code.errors %}
+                        <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="latitude"><span class="text-red">*</span>Latitude</label>
+              {{ company_form.latitude(class="form-control", placeholder="Latitude") }}
+              <div class="help-block with-errors"></div>
+                {% if company_form.latitude.errors %}
+                    {% for error in company_form.latitude.errors %}
+                        <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="longitude"><span class="text-red">*</span>Longitude</label>
+              {{ company_form.longitude(class="form-control", placeholder="Longitude") }}
+              <div class="help-block with-errors"></div>
+                {% if company_form.longitude.errors %}
+                    {% for error in company_form.longitude.errors %}
+                        <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            {% endif %}
+
+            <div class="form-group" aria-describedby="submit-tooltip">
+              <button type="submit" class="btn btn-primary"> Save</button>
+            </div>
+        </div>
+
+        <div class="col-md-6 settings-content" style="padding-top: 192px;">
+            <div class="form-group pull-left">
+              <label for="company_info">Company Profile</label>
+                {{ company_form.company_info(class="form-control", placeholder="Tell us something about company", rows="14", cols="100") }}
+            </div>
+        </div>
+
+      </form>
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock %}
+
+{% block lib_javascript %}
+  <script src="{{ url_for('static', filename='assets/js/daterangepicker.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/jquery.validate.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/additional-methods.js') }}"></script>
+{% endblock %}
+
+{% block custom_javascript %}
+  <script type="text/javascript">
+    $('#imgclick').click(function() {
+      $('#imgupload').trigger('click');
+    });
+  </script>
+
+  <script>
+    $(function(){
+      var profileImageURL;
+      var url_image = window.URL || window.webkitURL;
+      var image_container = document.getElementById('profilepic');
+
+      $(document).on('change', '#imgupload', function(){
+        var import_image = this;
+        import_image_profile(import_image);
+
+      });
+
+      function import_image_profile(source) {
+
+          var file_types = ['png','jpg','jpeg'];
+          var file_type_ctr = 0;
+
+          var files = source.files;
+          var file;
+          if (files && files.length) {
+            file = files[0];
+
+            for(var type in file_types){
+                if(file_types[type] === file.type.replace("image/","")){
+                    file_type_ctr += 1;
+                }
+            }
+
+            if(file_type_ctr == 0){
+                window.alert('Invalid file format');
+                return;
+            }
+
+            if (/^image\/\w+/.test(file.type)) {
+
+              var size = files[0].size;
+              var max_size = 2000000;
+              if (size > max_size) {
+                window.alert("Maximum file size exceeds");
+                source.value = null;
+                return;
+              } else {
+                image_container.src = profileImageURL = url_image.createObjectURL(file);
+              }
+
+
+            } else {
+              window.alert('Please choose an image file.');
+            }
+          }
+
+
+      }
+
+    });
+  </script>
+
+  <script>
+
+    $("#edit_company").validate({
+      rules: {
+        name: "required"
+      },
+      messages: {
+        name: "Company name is required."
+      },
+      errorElement: "span",
+      errorPlacement: function(error, element) {
+        // Add the `help-block` class to the error element
+        error.addClass("help-block has-error");
+        if (element.prop("type") === "checkbox") {
+          error.insertAfter(element.parent("label"));
+        } else {
+          error.insertAfter(element);
+        }
+      },
+      highlight: function(element, errorClass, validClass ) {
+        $(element).parents(".form-group").addClass("has-error").removeClass("has-success");
+      },
+      unhighlight: function(element, errorClass, validClass) {
+        $(element).parents(".form-group").removeClass("has-error");
+      }
+    });
+
+
+  </script>
+{% endblock %}

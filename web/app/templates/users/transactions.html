@@ -1,0 +1,467 @@
+{% extends "layouts/main.html" %}
+{% block body %}
+<style type="text/css">
+  a.inactive {
+    border:0;
+    background:0;
+  }
+  #transaction_div {
+      height: 800px;
+      overflow: auto;
+  }
+
+</style>
+  <div class="container sub-banner" id="transactions">
+    <div class="row">
+      {# start sidebar #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Transactions</h4>
+          <p><i>My Records</i></p>
+          <ul class="list-unstyled">
+            <li>
+              {% if transaction_type == 'selling' %}
+                <a class="active_category" href="{{ url_for ('UserTransactionBP.view_selling_transactions_page') }}">Resources to Share</a>
+              {% else %}
+                <a href="{{ url_for ('UserTransactionBP.view_selling_transactions_page') }}">Resources to Share</a>
+              {% endif %}
+            </li>
+            <li>
+              {% if transaction_type == 'buying' %}
+                <a class="active_category" href="{{ url_for ('UserTransactionBP.view_buying_transactions_page') }}">Resources Needed</a>
+              {% else %}
+                <a href="{{ url_for ('UserTransactionBP.view_buying_transactions_page') }}">Resources Needed</a>
+              {% endif %}
+            </li>
+          </ul>
+        </div>
+      </div> {# end sidebar #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page"  style="padding-bottom: 20px;">
+        {# start title #}
+        <div class="col-lg-12">
+          <div class="row">
+            <div class="col-sm-4">
+              <h5 class="center-page-header">
+                {% if transaction_type == 'buying' %}
+                  Resources Needed
+                {% else %}
+                  Resources to Share
+                {% endif %}
+              </h5>
+            </div>
+
+            <div id="sidebar" class="col-sm-8 transactions-type">
+              <ul class="nav navbar-nav pull-right">
+                <li>
+                  {% if transaction_type == 'buying' %}
+                    <a href="{{ url_for ('UserTransactionBP.view_buying_transactions_page', status='active') }}">On-going Transactions</a>
+                  {% else %}
+                    <a href="{{ url_for ('UserTransactionBP.view_selling_transactions_page', status='active') }}">On-going Transactions</a>
+                  {% endif %}
+                </li>
+                <li>
+                  {% if transaction_type == 'buying' %}
+                    <a href="{{ url_for ('UserTransactionBP.view_buying_transactions_page', status='completed') }}">Completed Transactions</a>
+                  {% else %}
+                    <a href="{{ url_for ('UserTransactionBP.view_selling_transactions_page', status='completed') }}">Completed Transactions</a>
+                  {% endif %}
+                </li>
+              </ul>
+            </div>
+
+          </div>
+          <hr class="header-line">
+        </div> {# end title #}
+
+        {# start breadcrumbs #}
+        <div class="col-lg-12">
+          <ol class="breadcrumb">
+            <li><a href="/">Home</a></li>
+            {% if transaction_type == 'buying' %}
+              <li class="active">Resources Needed</li>
+            {% else %}
+              <li class="active">Resources to Share</li>
+            {% endif %}
+
+            {% if status == 'active' %}
+              <li class="active_category">On-going Transactions</li>
+            {% else %}
+              <li class="active_category">Completed Transactions</li>
+            {% endif %}
+          </ol>
+        </div> {# end breadcrumbs #}
+
+        {% if transactions|length == 0 %}
+
+        <div class="blank-page">
+          <div class="empty-box text-left">
+            <p style="font-weight: bold; font-size: 15px; margin-top: 100px; margin-left: 15px;"><span>You don't have any transactions at the moment.</span></p>
+            <p style="font-size: 25px; margin-top: 10px; font-weight: bold; margin-left: 15px;"><span><i>Start browsing now!</i></span></p>
+            <p style="margin-left: 15px;" class="btn-horizontal-list"><a class="btn btn-primary" href="{{ url_for('UserBP.home_page') }}"><span>Browse Resources</span></a></p>
+          </div>
+        </div>
+
+        {% else %}
+
+        {# start transaction list #}
+        <div id="transaction_div" class="col-lg-12">
+          <div>
+          {% for transaction in transactions %}
+            {% if transaction.status == 'PENDING' %}
+            <div class="transaction-row">
+            {% else %}
+            <div class="transaction-row" style="background-color: #FFFFFF;">
+            {% endif %}
+                <div class="row">
+                  <div class="col-sm-4 col-xs-2 transaction-profile">
+                    <div class="media">
+                      <div class="media-left">
+                        <div class="transaction-avatar">
+                          {% if current_user.email == transaction.seller.email %}
+                            <img src="{{ transaction.buyer.image_url or 'http://placehold.it/180x180/000/fff' }}" alt="">
+                          {% else %}
+                            <img src="{{ transaction.seller.image_url or 'http://placehold.it/180x180/000/fff' }}" alt="">
+                          {% endif %}
+
+                        </div>
+                      </div>
+                      <div class="media-body">
+                        <div class="text-small">
+                          {% if current_user.email == transaction.seller.email %}
+                            <a href="{{ url_for('UserBP.view_profile_page', user_id=transaction.buyer.id) }}">
+                              {{ transaction.buyer.first_name }} {{ transaction.buyer.last_name }}
+                            </a>
+                          {% else %}
+                            <a href="{{ url_for('UserBP.view_profile_page', user_id=transaction.seller.id) }}">
+                              {{ transaction.seller.first_name }} {{ transaction.seller.last_name }}
+
+                            </a>
+                          {% endif %}
+                        </div>
+
+                        <div class="text-smaller text-muted">
+                          <span>
+                            {{ transaction.booking_start_date.strftime('%d %B, %Y') }} - {{ transaction.booking_end_date.strftime('%d %B, %Y') }}
+                          </span>
+                          <span>
+                            {{ transaction.reference_code }}
+                          </span>
+                        </div>
+
+                        <div class="text-small">
+                          {% if current_user.email == transaction.seller.email %}
+                            <a href="{{ url_for('CompanyBP.view_company_page', company_id=transaction.buyer.company.id) }}">
+                              {{ transaction.buyer.company.name|safe }}
+                            </a>
+                          {% else %}
+                            <a href="{{ url_for('CompanyBP.view_company_page', company_id=transaction.seller.company.id) }}">
+                              {{ transaction.seller.company.name|safe }}
+                            </a>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-8 col-xs-10">
+                    <div class="transaction-description">
+                      <div class="text-bold"><a href="{{ url_for('ResourceBP.resource_page', slug=transaction.resource.reference) }}">{{ transaction.resource.name|safe }}</a></div>
+                      <div class="text-small">S${{ transaction.resource.price }}</div>
+                      <div>
+                        <span>
+                          Qty Booked: {{ transaction.quantity }}
+                        </span>
+                      </div>
+                      <div>
+                        <span class="text-smaller text-muted">
+                        {% if transaction.chatroom_id is defined %}
+                          <a href="{{ url_for('UserBP.message_thread', message_id=transaction.chatroom_id) }}">
+                          {{ transaction.proposal|safe or 'Booked Resource' }}
+                          </a>
+                        {% else %}
+                          {{ transaction.proposal|safe }}
+                        {% endif %}
+                        </span>
+                      </div>
+                      <div class="transaction-icon-img">
+                        <img src="{{ transaction.resource.image_url or 'http://placehold.it/180x180/000/fff' }}" alt="" class="transaction-product-img">
+                      </div>
+                    </div>
+
+                    <div class="action-buttons pull-right">
+                    <form id="userForm" method="POST" class="form-horizontal">
+                    {{ transaction_form.csrf_token }}
+                      <br>
+                      {% if transaction.status == 'PENDING' %}
+
+                        {% if transaction_type == 'selling' %}
+                        <!-- <button type="submit" formaction="{{ url_for ('UserTransactionBP.accept_transaction_page', transaction_id=transaction.id) }}" class="btn btn-primary">Accept</button> -->
+                        <button type="button" value="{{ transaction.id }}" name="AgreementTemplate" class="btn btn-primary">Accept</button>
+                        <button id="reject_button" data-id="{{ transaction.id }}" type="button" class="btn btn-danger">Reject</button>
+                        {% else %}
+                          {% if transaction.agreements.agreement %}
+                            <a type="buton" href="{{ url_for ('UserTransactionBP.buying_agreement_page', transaction_id=transaction.id) }}" class="btn btn-primary">View Agreement</a>
+                          {% endif %}
+                        <button id="cancel_button" data-id="{{ transaction.id }}" type="button" class="btn btn-danger">Cancel</button>
+                        {% endif %}
+
+                      {% elif transaction.status == 'ACCEPTED' %}
+                        {% if transaction.is_buyer %}
+                          <div class="col-sm-16">
+                            {% if transaction.agreements.agreement %}
+                              {% if transaction.agreements.agreement.status == 'PENDING' %}
+                              <a type="button" href="{{ url_for ('UserTransactionBP.buying_agreement_page', transaction_id=transaction.id) }}" class="btn btn-primary">View Pending Agreement</a>
+                              {% else %}
+                              <a type="button" href="{{ url_for ('UserTransactionBP.buying_agreement_page', transaction_id=transaction.id) }}" class="btn btn-primary">View Agreement</a>
+                              {% endif %}
+                            {% endif %}
+                            <p style="color: #f9f9f9; text-align: center; font-weight: bolder; background-color: #FFA833; border-radius: 5px; padding: 2px;">ON-GOING</p>
+                          </div>
+                        {% else %}
+                          {% if not transaction.agreements.agreement %}
+                            <a type="buton" href="{{ url_for ('UserTransactionBP.selling_agreement_page', transaction_id=transaction.id) }}" class="btn btn-primary">Make Agreement</a>
+                          {% else %}
+                            <a type="buton" href="{{ url_for ('UserTransactionBP.selling_agreement_page', transaction_id=transaction.id) }}" class="btn btn-primary">View Agreement</a>
+                          {% endif %}
+                          <button type="submit" formaction="{{ url_for ('UserTransactionBP.complete_transaction_page', transaction_id=transaction.id) }}" class="btn btn-primary">Complete</button>
+                        {% endif %}
+
+                      {% elif transaction.status == 'COMPLETED'  %}
+
+                        {% if current_user.email == transaction.seller.email %}
+
+                          {% if transaction.buyer_rating %}
+                            <p><b>{{ transaction.buyer_rating.rating }} out of 5 stars</b></p>
+                          {% else %}
+                            <p class="rate-yo" data-id="{{ transaction.id }}"></p>
+                          {% endif %}
+
+                        {% elif current_user.email != transaction.seller.email %}
+
+                          {% if transaction.seller_rating %}
+                            <p><b>{{ transaction.seller_rating.rating }} out of 5 stars</b></p>
+                          {% else %}
+                            <p class="rate-yo" data-id="{{ transaction.id }}"></p>
+                          {% endif %}
+
+                        {% endif %}
+                      <div class="col-sm-12">
+                        <p style="color: #f9f9f9; background-color: #5cb85c; border-radius: 5px; padding: 2px;">{{ transaction.status }}</p>
+                      </div>
+                      {% else %}
+                      <div class="col-sm-12">
+                        <p style="color: #f9f9f9; background-color: #d9534f; border-radius: 5px; padding: 2px;">{{ transaction.status }}</p>
+                      </div>
+                      {% endif %}
+                      </form>
+                   </div>
+
+                  </div>
+                </div>
+            </div>
+          {% endfor %}
+          <!-- <div class="center-page-header"></div> -->
+        </div> {# end transaction list #}
+        {% endif %}
+        </div>
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div>
+
+
+  <!--Modal confirm-->
+  <div name="Rate" style="z-index:1051" class="modal fade DataTableModal" role="dialog">
+    <div class="modal-dialog">
+      <form class="modal-content" onsubmit="return false">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+          <h4 class="modal-title">Are you sure you want to rate this Item?</h4>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="form-group">
+              <div class="col-sm-12">
+                <label class="control-label"><i class="fa"></i> Message</label>
+                <textarea id="sMessageRatings"  name="sMessageRatings"  class="form-control" row="8" cols="20" type="text"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer customdlft">
+          <button name="Cancel" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button name="Confirm" type="button" onclick="rateItem()" class="btn btn-primary">Yes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Reject -->
+  <div id="Reject" name="Reject" style="z-index:1051" class="modal fade DataTableModal" role="dialog">
+    <div class="modal-dialog">
+      <form method="POST" role="form" files=true enctype="multipart/form-data" class="modal-content">
+      {{ transaction_form.csrf_token }}
+        <div class="modal-header">
+        <!-- <input type="hidden" name="user_id"> -->
+          <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+          <h4 class="modal-title">Confirmation</h4>
+        </div>
+        <div class="modal-body">
+          <!--Are you sure do you want to restore this Item?-->
+          Are you sure you want to reject this booking?
+        </div>
+        <div class="modal-footer customdlft">
+          <button name="Cancel" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button name="Confirm" type="submit" class="btn btn-primary">Yes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Cancel -->
+  <div id="Cancel" name="Cancel" style="z-index:1051" class="modal fade DataTableModal" role="dialog">
+    <div class="modal-dialog">
+      <form method="POST" role="form" files=true enctype="multipart/form-data" class="modal-content">
+      {{ transaction_form.csrf_token }}
+        <div class="modal-header">
+        <!-- <input type="hidden" name="user_id"> -->
+          <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+          <h4 class="modal-title">Confirmation</h4>
+        </div>
+        <div class="modal-body">
+          <!--Are you sure do you want to restore this Item?-->
+          Are you sure you want to cancel this booking?
+        </div>
+        <div class="modal-footer customdlft">
+          <button name="Cancel" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button name="Verify" type="submit" class="btn btn-primary">Yes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!--Modal Agreements Confirm-->
+  <div name="AgreementSelling" style="z-index:1051" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <form  method="POST" class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+          <h4 class="modal-title">Accept The Booking</h4>
+            {{ transaction_form.csrf_token }}
+        </div>
+        <div class="modal-body">
+          <div class="row">
+              <div class="col-lg-12">
+                <p>Would you like to use our agreement template for this transaction?</p>
+              </div>
+          </div>
+        </div>
+        <div class="modal-footer customdlft">
+          <button name="No" type="submit" class="btn btn-primary">No</button>
+          <button name="Cancel" type="submit" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button name="Yes" type="submit" class="btn btn-primary">Yes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block custom_javascript %}
+  <script src="{{ url_for('static', filename='plugins/tinymce/tinymce.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/custom/modules/AgreementSelling.js') }}"></script>
+  <script>
+  window.transaction_id = null;
+  AgreementSelling.init(function(){
+    cCb && cCb();
+  });
+  $(function(){
+    $('.nav-tabs a').click(function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+      var scrollmem = $('body').scrollTop() || $('html').scrollTop();
+      var str = this.hash;
+      var rep = str.replace("#", "");
+      window.history.pushState(null, null, rep);
+      $('html,body').scrollTop(scrollmem);
+    });
+  });
+  </script>
+
+  {# Reject Confirmation #}
+  <script>
+   $(document).on("click", "#reject_button", function () {
+     var myBookId = $(this).data('id');
+     // alert(myBookId);
+     $("div[name='Reject']").modal('show');
+     $('button[name="Confirm"]').attr("formaction", "/transactions/"+myBookId+"/reject");
+    });
+  </script>
+
+  {# Cancel Confirmation #}
+  <script>
+   $(document).on("click", "#cancel_button", function () {
+     var myBookId = $(this).data('id');
+     // alert(myBookId);
+     $("div[name='Cancel']").modal('show');
+     $('button[name="Verify"]').attr("formaction", "/transactions/"+myBookId+"/cancel");
+    });
+  </script>
+
+  <!-- <script>
+    var url = window.location;
+
+    $('ul.nav a[href="'+ url +'"]').parent().addClass('active_category');
+
+    $('ul.nav a').filter(function() {
+        return this.href == url;
+    }).parent().addClass('active_category');
+  </script> -->
+
+  <script>
+    $(document).ready(function(){
+      $('ul li a').click(function(){
+        $('li a').removeClass("active_category");
+        $(this).addClass("active_category");
+      });
+    });
+  </script>
+
+  <script>
+    window.aDataRate = null;
+    $(function(){
+
+      $(".rate-yo").rateYo({
+          starWidth:"20px",
+          // halfStar: false,
+          precision: 0,
+        })
+
+        .on("rateyo.set", function (e, data) {
+            // alert("The rating is set to " + data.rating + "!");
+            var transaction_id = $('.rate-yo').data('id');
+            var rating = data.rating;
+            aDataRate = {
+              transaction_id : $('.rate-yo').data('id'),
+              rating         : data.rating
+            };
+
+            $("div[name='Rate']").modal('show');
+      });
+
+    });
+
+    function rateItem(aArg){
+        $("div[name='Rate']").modal('hide');
+        $.ajax({
+          type: 'GET',
+          url: '/transactions/' + aDataRate.transaction_id + '/rate',
+          data: {"rating": aDataRate.rating , "message" : $("textarea#sMessageRatings").val() },
+          success: function(data) {
+            location.reload();
+          }
+        });
+    }
+  </script>
+{% endblock %}

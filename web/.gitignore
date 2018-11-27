@@ -1,0 +1,12 @@
+*.pyc
+.DS_Store
+venv/
+.idea/*
+alembic.ini
+app/src/utils/database.py
+env.cfg
+desktop
+app/static/uploads/*
+app/static/*.zip
+app/static/assets/img/*.zip
+.vscode/

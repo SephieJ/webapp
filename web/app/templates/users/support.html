@@ -1,0 +1,97 @@
+{% extends "layouts/main.html" %}
+{% block body %}
+  {# start main body #}
+  <div class="container sub-banner" id="transactions">
+    <div class="row">
+      {# start sidebar #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Support Tickets</h4>
+          {# <p><i>Inbox</i></p> #}
+          <ul class="list-unstyled">
+            <li><a class="active_category" href="#">Create</a></li>
+            <li><a href="{{ url_for('UserSupportBP.pending_support_page' )}}">Pending</a></li>
+            <li><a href="{{ url_for('UserSupportBP.completed_support_page')}}">Completed</a></li>
+          </ul>
+        </div>
+      </div> {# end sidebar #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        {# start breadcrumbs #}
+        <div class="col-lg-12">
+          <div class="row">
+            <div class="col-sm-4">
+              <h5 class="center-page-header">Support Tickets</h5>
+            </div>
+          </div>
+          <hr class="header-line">
+        </div> {# end breadcrumbs #}
+
+        <div class="col-lg-12">
+          <ol class="breadcrumb">
+            <li><a href="{{ url_for('UserBP.home_page') }}">Home</a></li>
+            <li>Support Tickets</li>
+            <li class="active">Create</li>
+          </ol>
+        </div>
+
+
+        <div class="col-lg-7">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+          <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+          {% if messages %}
+          {% for category, message in messages %}
+          <div class="alert alert-flash alert-{{ category }} alert-dismissible" role="alert" style="margin-top: 10px;">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <!-- <strong>Title</strong> --> {{ message }}
+          </div>
+          {% endfor %}
+          {% endif %}
+          {% endwith %}
+
+          <div class="">
+            <form form role="form" id="raise_support" name="raise_support" class="raise_support-form" method="POST" action="{{ url_for('UserSupportBP.support_page') }}" files=true enctype="multipart/form-data">
+              {{ support_form.csrf_token }}
+              {% if support_form.subject.errors %}
+                <div class="form-group input-display-has-error has-error">
+                  {% else %}
+                <div class="form-group">
+                  {% endif %}
+                <label for="subject">Subject</label>
+                {{ support_form.subject(class="form-control", placeholder="Subject") }}
+                {% if support_form.subject.errors %}
+                {% for error in support_form.subject.errors %}
+                <span class="help-block">{{ error }}</span>
+                {% endfor %}
+                {% endif %}
+              </div>
+              <!-- <div class="form-group">
+                <label for=""><a href="">Add resources?</a></label>
+              </div> -->
+              {% if support_form.message.errors %}
+                <div class="form-group input-display-has-error has-error">
+                  {% else %}
+              <div class="form-group">
+                  {% endif %}
+                <label for="Description">Description</label>
+                {{ support_form.message(class="form-control", placeholder="Description...", rows="7") }}
+                {% if support_form.message.errors %}
+                {% for error in support_form.message.errors %}
+                <span class="help-block">{{ error }}</span>
+                {% endfor %}
+                {% endif %}
+              </div>
+              <div class="form-group" aria-describedby="submit-tooltip">
+                <button type="submit" class="btn btn-primary">
+                  <span>Submit</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock %}

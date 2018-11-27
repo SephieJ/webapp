@@ -1,0 +1,60 @@
+{% extends "layouts/sign_up.html" %}
+{% block parent_layout %}
+<nav class="navbar navbar-expand-md bg-white navbar-light">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('UserBP.home_page') }}">
+      <img src="{{ url_for('static', filename='assets/img/logo_header.png') }}" alt="" class="img-responsive"></a>
+      <p class="m-2">Be part of the B2B resource sharing movement!</p>
+    </div>
+  </nav>
+  <div class="bg-light w-100">
+    <img src="{{ url_for('static', filename='assets/img/banner_head.jpg') }}" class="img-responsive">
+    <div class="container">
+      <div class="row"></div>
+    </div>
+  </div>
+
+  <div class="py-4 bg-light text-dark">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-7">
+          <p>Resources to Share, R2S, is a B2B digital platform which offers businesses a simple yet powerful way to optimise and maximise their underutilised resources through collaboration with each other.</p>
+          <p class="mb-4">Be one of the first to sign up for free during our pre-launch and we will get in touch with you when the platform is ready!</p>
+          <h3 class="mb-4">Why sign up?</h3>
+          <div class="row text-center">
+            <div class="col-md-2 col-5 mx-2 mb-4">
+              <a>
+              <img src="{{ url_for('static', filename='assets/img/icon_monetise.png') }}" class="w-100" href="#"> </a>
+              <b>Monetize underutilized resources</b>
+            </div>
+            <div class="col-md-2 col-5 mx-2 mb-4">
+              <a>
+              <img src="{{ url_for('static', filename='assets/img/icon_reduceexpense.png') }}" class="w-100" href="#"> </a>
+              <b>Reduce capital expenditure on assets</b>
+            </div>
+            <div class="col-md-2 col-5 mx-2 mb-4">
+              <a>
+              <img src="{{ url_for('static', filename='assets/img/icon_handshake.png') }}" class="w-100" href="#"> </a>
+              <b>Increase business collaboration &amp; innovation</b>
+            </div>
+            <div class="col-md-2 col-5 mx-2 mb-4">
+              <a>
+              <img src="{{ url_for('static', filename='assets/img/icon_business.png') }}" class="w-100" href="#"> </a>
+              <b>Sustainable business practices</b>
+            </div>
+            <div class="col-md-2 col-5 mx-2 mb-5">
+              <a>
+              <img src="{{ url_for('static', filename='assets/img/icon_productivity.png') }}" class="w-100" href="#"> </a>
+              <b>Increased productivity &amp; growth</b>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-5 pb-0 p-4 bg-white text-center">
+          <h4 class="mb-4">Thank you for signing up!</h4>
+          <p>We have sent you an email to confirm your signup.</p>
+          <p>You will receive an email when we’re ready for you to list your resources.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

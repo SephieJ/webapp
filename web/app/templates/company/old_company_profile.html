@@ -1,0 +1,253 @@
+{% extends "layouts/main.html" %}
+{% block head %}
+  <link href="{{ url_for('static', filename='assets/css/selectize.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='assets/css/selectize.default.css') }}" rel="stylesheet">
+{% endblock %}
+{% block body %}
+  {# start main body #}
+  <div class="container sub-banner" id="resource-profile">
+    <div class="row">
+      {# start sidebar category #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Category</h4>
+
+          <div class="form-group">
+            <select name="categories" id="categories" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);" multiple="multiple" data-placeholder="Search" style="width:100%;" tabindex="5">
+              {% for category in categories %}
+                <optgroup>
+                    <option value="{{base_url}}/categories/{{ category.id }}">{{ category.name }}</option>
+                </optgroup>
+              {% endfor %}
+            </select>
+            <div class="help-block with-errors"></div>
+          </div>
+
+          <input id="scrollup" type="image" width="170" height="20" name="scroll_up" src="{{ url_for('static', filename='assets/img/scrollup.png') }}">
+            <ul id="box" class="list-unstyled" style="height: 340px; overflow: hidden;">
+              {% for category in categories %}
+                <li>
+                  <li class="ellipsis"><a id="category_name" href="{{ url_for ('CategoryBP.view_category_page', category_id=category.id) }}">{{ category.name }}</a></li>
+                </li>
+              {% endfor %}
+            </ul>
+          <input id="scrolldown" type="image" width="170" height="20" name="scroll_down" src="{{ url_for('static', filename='assets/img/scrolldown.png') }}">
+
+          {% if current_user.is_authenticated %}
+          <br>
+          <h4>Wishlists</h4>
+          <ul class="list-unstyled">
+            {% for wishlist in wishlists %}
+              {% for wish_cat in wishlist.categories %}
+              <li>
+                <li><a href="{{ url_for('ResourceBP.view_wishlist_page', slug=wishlist.reference) }}">{{ wish_cat.main_category_name }}</a></li>
+              </li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+          {% else %}
+          {% endif %}
+        </div>
+      </div> {# end sidebar category #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        <div class="col-lg-12">
+          <h4 class="center-page-header">{{ company.name }}</h4>
+          <hr class="header-line">
+        </div>
+
+        {# start breadcrumbs #}
+        <div class="col-lg-12">
+          <ol class="breadcrumb">
+            <li><a href="{{ url_for('UserBP.home_page') }}">Home</a></li>
+            <li class="">{{ company.name }}</li>
+          </ol>
+
+          <div class="col-lg-6 pull-right">
+            <h4><b>Employees</b></h4>
+            <div class="col-sm-12">
+            {% for member in members[:5] %}
+              {% if member.status == 'ACTIVATED' %}
+              <div class="media">
+                <div class="media-left media-top">
+                  <img src="{{ url_for('static', filename='assets/img/avatar.png') }}" class="media-object" style="width:60px">
+                </div>
+                <div class="media-body">
+                  <h5 class="media-heading"><a href="{{ url_for('UserBP.view_profile_page', user_id=member.id) }}"><b>{{ member.first_name }} {{ member.last_name }}</b></a>
+                  {% if 'PIONEER' in member.roles %}
+                    <span class="badge">PIONEER</span>
+                  {% else %}
+                  {% endif %}
+                  </h5>
+                  <div class="resource-rate pull-left" data-src="5"></div>
+                </div>
+              </div>
+              {% endif %}
+            {% endfor %}
+            </div>
+          </div>
+
+          {% if company.image_url %}
+          <img src="{{ company.image_url }}" class="img-thumbnail" width="30%" height="50%">
+          {% else %}
+          <img src="{{ url_for('static', filename='assets/img/building.png') }}" class="img-thumbnail" width="30%" height="50%">
+          {% endif %}
+          <br>
+          <br>
+
+          <d
+          <h5>
+          <strong><i class="fa fa-info-circle" aria-hidden="true"></i> Company Info</strong>
+          </h5>
+          <p>{{ company.company_info or '' }}</p>
+
+          <h5>
+          <strong><i class="fa fa-phone-square" aria-hidden="true"></i> Office Number</strong>
+          </h5>
+          <p>{{ company.office_number or 'N.A.' }}</p>
+
+          <h5>
+          <strong><i class="fa fa-mobile"" aria-hidden="true"></i> Mobile Number</strong>
+          </h5>
+          <p>{{ company.office_number or 'N.A.' }}</p>
+
+          <h5>
+          <strong><i class="fa fa-address-card" aria-hidden="true"></i> Address</strong>
+          </h5>
+          {% if company.address %}
+          <p>{{ company.address.unit_number }} {{ company.address.block_street }}, {{ company.address.postal_code }}</p>
+          {% else %}
+          <p>N.A.</p>
+          {% endif %}
+          <br>
+
+          <h5>
+          <strong><i class="fa fa-desktop" aria-hidden="true"></i> Website Page</strong>
+          </h5>
+          {% if company.website %}
+          <a href="{{ company.website }}">{{ company.website }}</a>
+          {% else %}
+          <p>N.A.</p>
+          {% endif %}
+
+          <h5>
+          <strong><i class="fa fa-facebook-official" aria-hidden="true"></i> Facebok</strong>
+          </h5>
+          {% if company.facebook %}
+          <a href="{{ company.facebook }}">{{ company.facebook }}</a>
+          {% else %}
+          <p>N.A.</p>
+          {% endif %}
+
+          <h5>
+          <strong><i class="fa fa-linkedin-square" aria-hidden="true"></i> LinkedIn</strong>
+          </h5>
+          {% if company.linkedin %}
+          <a href="{{ company.linkedin }}">{{ company.linkedin }}</a>
+          {% else %}
+          <p>N.A.</p>
+          {% endif %}
+
+        </div> {# end breadcrumbs #}
+
+        <div class="clearfix"></div>
+
+        </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock %}
+
+{% block lib_javascript %}
+  <script src="{{ url_for('static', filename='assets/js/selectize.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/selectize_no_result_plugin.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/rateyo.js') }}"></script>
+{% endblock %}
+
+{% block custom_javascript %}
+
+  {# Scroll bar Categories}
+  <script>
+    $(document).ready(function () {
+        $('#scrolldown').click(function () {
+            $('#box').animate({
+                scrollTop: '+=50'
+            }, 500);
+        });
+
+    });
+
+    $(document).ready(function () {
+        $('#scrollup').click(function () {
+            $('#box').animate({
+                scrollTop: '-=50'
+            }, 500);
+        });
+    });
+  </script>
+
+  {# Search Categories #}
+  <script type="text/javascript">
+    // document.ready
+    $( document ).ready(function() {
+      $("#parent_category").hide();
+      $("#parent_category_label").hide();
+      $("#subcategory").hide();
+      $("#subcategory_label").hide();
+      initCategorySel();
+    });
+
+    // show image picker
+    $('#imgclick').click(function() {
+      $('#imgupload').trigger('click');
+    });
+
+    // init category selectize
+    function initCategorySel() {
+      $('#categories').selectize({
+        plugins: ['remove_button', 'restore_on_backspace', 'no_results'],
+        maxItems: 1,
+        onChange: function(value) {
+          if(value !== null) {
+            $("#categories-error").hide();
+          } else {
+            $("#categories-error").show();
+          }
+        }
+      });
+    }
+
+  </script>
+
+  {# Ratings #}
+  <script>
+    $(function () {
+
+      setTimeout(function(){
+          var ratings = $('.resource-rate');
+          var rVal = 0;
+          for(var i = 0 ; i < ratings.length ; i++ ){
+
+            var src = ratings[i].getAttribute('data-src');
+              rVal += parseInt(src);
+            $(ratings[i]).rateYo({
+              rating: src,
+              readOnly: true,
+              starWidth: "20px",
+            });
+          }
+        tRval = rVal / ratings.length;
+        // $('.rAverage').html(tRval +" out of 5 stars");
+        $('.sStartAve').rateYo({
+          rating: tRval,
+          readOnly: true,
+          starWidth: "20px",
+        });
+
+
+      },2000);
+
+    });
+  </script>
+{% endblock %}

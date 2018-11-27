@@ -1,0 +1,216 @@
+
+{% extends "layouts/main.html" %}
+{% block body %}
+  {# start main body #}
+  <div class="container sub-banner" id="transactions">
+    <div class="row">
+      {# start sidebar #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Support Tickets</h4>
+          {# <p><i>Pending</i></p> #}
+          <ul class="list-unstyled">
+            <li><a href="{{ url_for('UserSupportBP.support_page') }}">Create</a></li>
+            <li><a class="active_category" href="{{ url_for('UserSupportBP.pending_support_page') }}">Pending</a></li>
+            <li><a href="{{ url_for('UserSupportBP.completed_support_page') }}">Completed</a></li>
+          </ul>
+        </div>
+      </div> {# end sidebar #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        {# start breadcrumbs #}
+        <div class="col-lg-12">
+          <div class="row">
+            <div class="col-sm-4">
+              <h5 class="center-page-header">Pending</h5>
+            </div>
+          </div>
+          <hr class="header-line">
+        </div> {# end breadcrumbs #}
+
+        <div class="col-lg-12">
+          <ol class="breadcrumb">
+            <li><a href="{{ url_for('UserBP.home_page') }}">Home</a></li>
+            <li>Support Tickets</li>
+            <li class="active">Chat</li>
+          </ol>
+        </div>
+
+
+        <div class="col-lg-12">
+          {# start resource info #}
+          <div class="resource-message-info">
+            <div class="row">
+              {% for ticket in tickets %}
+                      <div class="col-sm-6 col-xs-2 transaction-message">
+                        <div class="media">
+                          <div class="media-body">
+                            <div class="text-bold">
+                              <h4><b>{{ ticket.subject|safe }}</b></h4>
+                            </div>
+                            <div class="text-smaller">
+                              <p>{{ ticket.created_date.strftime('%d %B, %Y %H:%M') }}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-sm-6 col-xs-10">
+                        <div class="transaction-message-desc">
+                          <p>
+                            {# description may be put here #}
+                          </p>
+                        </div>
+                      </div>
+              {% endfor %}
+            </div>
+          </div>{# end resource info #}
+
+          {# start main inbox #}
+          <div class="main-inbox">
+            {# start chat messages #}
+            <div class="chat-messages" id="chat-msgs-div">
+                {% for msg_thread in msg_threads %}
+                  <div id="msg-bubble-icon-{{ msg_thread.id }}" class="chat-message mes-me">
+                    <div class="chat-bubble mes-me">
+                      <div class="chat-bubble-msg">
+                        {{ msg_thread.created_date.strftime('%d-%b-%Y, %Y %H:%M') }}
+                        <br>
+                        {{ msg_thread.message }}
+                      </div>
+                    </div>
+                    <i class="fa fa-check-circle" aria-hidden="true"></i>
+                  </div>
+
+                  <!-- <div class="chat-message mes-other">
+                    <div class="chat-bubble mes-other">
+                      <div class="chat-bubble-msg">
+
+                      </div>
+                    </div>
+                  </div> -->
+                {% endfor %}
+            </div> {# end chat messages #}
+          </div> {# end main inbox #}
+
+          {# start chat control #}
+          {# <a href="#">
+            <div class="chat-image-upload">
+              <i class="fa fa-picture-o fa-lg" aria-hidden="true"></i>
+            </div>
+          </a> #}
+          <div class="chat-form">
+              <form action="#">
+                {{ support_form.csrf_token }}
+
+                {{ support_form.message(class="chat-form-input", placeholder="Type a message...", rows="1")}}
+              </form>
+
+              <div class="chat-send">
+                  <button id="btn-msg-send" class="btn btn-link btn-chat-send">Send</button>
+              </div>
+          </div> {# end chat control #}
+        </div>
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock %}
+
+{% block custom_javascript %}
+<script>
+    $(document).ready(function() {
+        var chatMessageDiv = document.getElementById("chat-msgs-div");
+        chatMessageDiv.scrollTop = chatMessageDiv.scrollHeight;
+    });
+</script>
+<script>
+     var token = $('input[name=csrf_token]').val();
+     var msg_bubble_id = 0;
+
+     //jQuery function for listening "Enter" keypress in textarea
+     $.fn.enterKey = function (fnc) {
+        return this.each(function () {
+            $(this).keypress(function (ev) {
+                var keycode = (ev.keyCode ? ev.keyCode : ev.which);
+                if (keycode == '13') {
+                    fnc.call(this, ev);
+                }
+            });
+        });
+     }
+
+     $("#btn-msg-send").click(function() {
+        sendMessage();
+     });
+
+     $("#message").enterKey(function () {
+        sendMessage();
+     });
+
+     function chatAutoScroll(){
+        var chatMessageDiv = document.getElementById("chat-msgs-div");
+        chatMessageDiv.scrollTop = chatMessageDiv.scrollHeight;
+     }
+
+     function sendMessage(){
+       var msg = document.getElementById("message").value;
+       var resource_id = document.getElementById("resource_id").value;
+       var msg_json = "";
+       var sender_bubble = "";
+       var sender_bubble_icon = "";
+
+       if ($.trim(msg) == ''){
+         $('#message').val('').focus();
+         return false;
+       } else {
+         msg_json = {
+            "resource_id" : resource_id,
+            "message" : msg
+         };
+
+         msg_bubble_id += 1;
+         $('#message').val('').blur();
+
+         sender_bubble =
+            '<div id="msg-bubble-' + msg_bubble_id + '" class="chat-message mes-me">' +
+                '<div class="chat-bubble mes-me">' +
+                    '<div class="chat-bubble-msg">' +
+                        msg +
+                    '</div>' +
+                '</div>' +
+                ' <i id="msg-bubble-icon' + msg_bubble_id + '" class="fa fa-circle-o-notch fa-spin" aria-hidden="true"> </i>' +
+            '</div>'
+
+         $('.chat-messages').append(sender_bubble);
+         chatAutoScroll();
+
+         //AJAX call for uploading upon image cropping
+         $.ajax({
+            headers: {'X-CSRF-TOKEN' : token},
+            type: 'POST',
+            dataType : 'json',
+            data: JSON.stringify(msg_json),
+            contentType: 'application/json; charset=utf-8',
+            url: '/inbox/messages/' + {{ msg_id }},
+            success: function(data){
+                sender_bubble_icon = ' <i id="msg-bubble-icon' + msg_bubble_id + '" class="fa fa-check-circle" aria-hidden="true"></i>'
+                $('#msg-bubble-icon' + msg_bubble_id).remove();
+                $('#msg-bubble-' + msg_bubble_id).append(sender_bubble_icon);
+                $('#message').focus();
+            },
+            error: function(error_msg){
+              console.log(error_msg);
+              sender_bubble_icon = ' <i id="msg-bubble-icon' + msg_bubble_id + '" class="fa fa-times-circle" aria-hidden="true"></i>'
+              $('#msg-bubble-icon' + msg_bubble_id).remove();
+              $('#msg-bubble-' + msg_bubble_id).append(sender_bubble_icon);
+              $('#message').focus();
+            }
+         });
+
+       }
+     }
+
+</script>
+{% endblock %}

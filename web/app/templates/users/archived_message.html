@@ -1,0 +1,225 @@
+{% extends "layouts/main.html" %}
+{% block body %}
+  {# start main body #}
+  <div class="container sub-banner" id="transactions">
+    <div class="row">
+      {# start sidebar #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Messages</h4>
+          {# <p><i>Inbox</i></p> #}
+          <ul class="list-unstyled">
+            <li><a href="{{ url_for('UserBP.view_message_list') }}">Inbox</a></li>
+            <li><a class="active_category" href="{{ url_for('UserBP.archived_message_list') }}">Archive</a></li>
+          </ul>
+        </div>
+      </div> {# end sidebar #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        {# start breadcrumbs #}
+        <div class="col-lg-12">
+          <div class="row">
+            <div class="col-sm-4">
+              <h5 class="center-page-header">Archived Message</h5>
+            </div>
+          </div>
+          <hr class="header-line">
+        </div> {# end breadcrumbs #}
+        <div class="col-lg-12">
+          <ol class="breadcrumb">
+            <li><a href="{{ url_for('UserBP.home_page') }}">Home</a></li>
+            <li class="active">Archived Message</li>
+          </ol>
+        </div>
+
+
+        <div class="col-lg-12">
+          {# start resource info #}
+          <div class="resource-message-info">
+            <div class="row">
+              {% for message in messages %}
+                {% if message.id == msg_id %}
+                  {% for participant in message.participants %}
+                    {% if participant.account_id != current_user.id %}
+                      <div class="col-sm-6 col-xs-2 transaction-message">
+                        <div class="media">
+                          <div class="media-left">
+                            <div class="transaction-resource-image">
+                              <img src="{{ message.resource.image_url }}" alt="">
+                            </div>
+                          </div>
+                          <div class="media-body">
+                            <div class="text-bold">
+                              <h4>{{ message.resource.name|safe }}</h4>
+                            </div>
+                            <div class="text-smaller">
+                              <p><i class="fa fa-user btn-icon" aria-hidden="true"></i> <a href="">{{ participant.account_name }}</a></p>
+                            </div>
+                            <div>
+                              <p><i class="fa fa-tag btn-icon" aria-hidden="true"></i> S${{ message.resource.price }}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-sm-6 col-xs-10">
+                        <div class="transaction-message-desc">
+                          <p>
+                            {# description may be put here #}
+                          </p>
+                        </div>
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>{# end resource info #}
+
+          {# start main inbox #}
+          <div class="main-inbox">
+            {# start chat messages #}
+            <div class="chat-messages" id="chat-msgs-div">
+
+              {% for thread in msg_thread %}
+                {% if thread.author_id == current_user.id %}
+                  <div id="msg-bubble-icon-{{ thread.id }}" class="chat-message mes-me">
+                    <div class="chat-bubble mes-me">
+                      <div class="chat-bubble-msg">
+                        {{ thread.message }}
+                      </div>
+                    </div>
+                    <i class="fa fa-check-circle" aria-hidden="true"></i>
+                  </div>
+                {% else %}
+                  <div class="chat-message mes-other">
+                    <div class="chat-bubble mes-other">
+                      <div class="chat-bubble-msg">
+                        {{ thread.message }}
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div> {# end chat messages #}
+          </div> {# end main inbox #}
+
+          {# start chat control #}
+          {# <a href="#">
+            <div class="chat-image-upload">
+              <i class="fa fa-picture-o fa-lg" aria-hidden="true"></i>
+            </div>
+          </a> #}
+           {# end chat control #}
+        </div>
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock %}
+
+{% block custom_javascript %}
+<script>
+    $(document).ready(function() {
+        var chatMessageDiv = document.getElementById("chat-msgs-div");
+        chatMessageDiv.scrollTop = chatMessageDiv.scrollHeight;
+    });
+</script>
+<!-- <script type="text/javascript">
+  window.onload=function() {
+   document.getElementById("archive_thread").onclick=function() {
+     document.getElementById("form{{msg_id}}").submit();
+     return true; // cancel the actual link
+   }
+ }
+</script> -->
+<script>
+     var token = $('input[name=csrf_token]').val();
+     var msg_bubble_id = 0;
+
+     //jQuery function for listening "Enter" keypress in textarea
+     $.fn.enterKey = function (fnc) {
+        return this.each(function () {
+            $(this).keypress(function (ev) {
+                var keycode = (ev.keyCode ? ev.keyCode : ev.which);
+                if (keycode == '13') {
+                    fnc.call(this, ev);
+                }
+            });
+        });
+     }
+
+     $("#btn-msg-send").click(function() {
+        sendMessage();
+     });
+
+     $("#message").enterKey(function () {
+        sendMessage();
+     });
+
+     function chatAutoScroll(){
+        var chatMessageDiv = document.getElementById("chat-msgs-div");
+        chatMessageDiv.scrollTop = chatMessageDiv.scrollHeight;
+     }
+
+     function sendMessage(){
+       var msg = document.getElementById("message").value;
+       var resource_id = document.getElementById("resource_id").value;
+       var msg_json = "";
+       var sender_bubble = "";
+       var sender_bubble_icon = "";
+
+       if ($.trim(msg) == ''){
+         $('#message').val('').focus();
+         return false;
+       } else {
+         msg_json = {
+            "resource_id" : resource_id,
+            "message" : msg
+         };
+
+         msg_bubble_id += 1;
+         $('#message').val('').blur();
+
+         sender_bubble =
+            '<div id="msg-bubble-' + msg_bubble_id + '" class="chat-message mes-me">' +
+                '<div class="chat-bubble mes-me">' +
+                    '<div class="chat-bubble-msg">' +
+                        msg +
+                    '</div>' +
+                '</div>' +
+                ' <i id="msg-bubble-icon' + msg_bubble_id + '" class="fa fa-circle-o-notch fa-spin" aria-hidden="true"> </i>' +
+            '</div>'
+
+         $('.chat-messages').append(sender_bubble);
+         chatAutoScroll();
+
+         //AJAX call for uploading upon image cropping
+         $.ajax({
+            headers: {'X-CSRF-TOKEN' : token},
+            type: 'POST',
+            dataType : 'json',
+            data: JSON.stringify(msg_json),
+            contentType: 'application/json; charset=utf-8',
+            url: '/inbox/messages/' + {{ msg_id }},
+            success: function(data){
+                sender_bubble_icon = ' <i id="msg-bubble-icon' + msg_bubble_id + '" class="fa fa-check-circle" aria-hidden="true"></i>'
+                $('#msg-bubble-icon' + msg_bubble_id).remove();
+                $('#msg-bubble-' + msg_bubble_id).append(sender_bubble_icon);
+                $('#message').focus();
+            },
+            error: function(error_msg){
+              console.log(error_msg);
+              sender_bubble_icon = ' <i id="msg-bubble-icon' + msg_bubble_id + '" class="fa fa-times-circle" aria-hidden="true"></i>'
+              $('#msg-bubble-icon' + msg_bubble_id).remove();
+              $('#msg-bubble-' + msg_bubble_id).append(sender_bubble_icon);
+              $('#message').focus();
+            }
+         });
+
+       }
+     }
+
+</script>
+{% endblock %}

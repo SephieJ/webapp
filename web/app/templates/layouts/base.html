@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width, initial-scale=1" name="viewport"><!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>R2S - Resources To Share</title><!-- Bootstrap -->
+    <link href="{{ url_for('static', filename='assets/css/bootstrap.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/font-awesome/css/font-awesome.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/css/animate.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/css/rateyo.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/css/chat.css') }}" rel="stylesheet">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='uploads/favicon.ico') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+      <![endif]-->
+    {% block head %}{% endblock %}
+    <link href="{{ url_for('static', filename='assets/css/custom.css') }}" rel="stylesheet">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <!-- Google Tag Manager -->
+    <script>
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-N8NZ3SL');
+    </script>
+    <!-- End Google Tag Manager -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-113630950-1');
+    </script>
+  </head>
+
+  <body>
+    {% block parent_layout %}{% endblock %}
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+      <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N8NZ3SL"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js">
+    </script>
+    <!-- <script src="{{ url_for('static', filename='assets/js/bootstrap.min.js') }}"></script> -->
+    <script src="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.js"></script>
+    <script src="{{ url_for('static', filename='assets/js/moment.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/rateyo.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <!--added main.js-->
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+    <script src="https://cdn.datatables.net/plug-ins/1.10.16/sorting/datetime-moment.js"></script> -->
+    <!-- <script src="https://cdn.datatables.net/plug-ins/1.10.16/sorting/date-uk.js"></script> -->
+    <script>
+        window.sKey = '{{ pusher_app_key }}';
+    </script>
+    <script src="{{ url_for('static', filename='assets/js/custom/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/custom/php.js') }}"></script>
+    <!-- Pusher JS -->
+    <script src="https://js.pusher.com/4.0/pusher.min.js"></script>
+    <!-- Bootstrap notification -->
+    <script src="{{ url_for('static', filename='assets/js/bootstrap-notify.min.js') }}"></script>
+
+
+    {% block lib_javascript %}{% endblock %}
+
+
+    <script type="text/javascript">
+
+      var getUrl = window.location;
+      var baseUrl = getUrl .protocol + "//" + getUrl.host;
+      //window.sUrl= 	"http://localhost:5001";
+      window.sUrl= 	baseUrl;
+
+    </script>
+
+    {% if current_user.is_authenticated %}
+    <script>
+      $(document).ready(function() {
+
+          var pusher_key = '{{ pusher_app_key }}';
+
+          var pusher = new Pusher(pusher_key, {
+            cluster: 'ap1',
+            encrypted: true
+          });
+
+          var self_url = window.location.href;
+          var message_url = '{{base_url}}' + '/inbox/messages/';
+          var new_message_url = '{{base_url}}' + '/inbox/messages/new?rid=';
+          var receiver_bubble = "";
+
+          var channel_id = '{{current_user.account_id}}';
+
+          if(channel_id != null || channel_id != ""){
+
+            var channel = pusher.subscribe(channel_id);
+            channel.bind('Transaction Created', function(data) {
+               generateNotification(data);
+            });
+
+            channel.bind('Transaction Cancelled', function(data) {
+               generateNotification(data);
+            });
+
+            channel.bind('Transaction Accepted', function(data) {
+               generateNotification(data);
+            });
+
+            channel.bind('Transaction Rejected', function(data) {
+               generateNotification(data);
+            });
+
+            channel.bind('Message Received', function(data) {
+
+               receiver_bubble =
+                '<div class="chat-message mes-other">' +
+                    '<div class="chat-bubble mes-other">' +
+                        '<div class="chat-bubble-msg">' +
+                            data.chat_message +
+                        '</div>' +
+                    '</div>' +
+                '</div>'
+
+                if (self_url == message_url + data.room_id) {
+                    $('.chat-messages').append(receiver_bubble);
+                } else if (self_url == new_message_url + data.resource_id) {
+                    $('.chat-messages').append(receiver_bubble);
+                } else {
+                    generateNotification(data);
+                }
+
+            });
+
+          }
+      });
+
+      function generateNotification(data){
+          $.notify({
+              icon: data['image'],
+              title: data['title'],
+              message: data['message'],
+              url: data['target_link']
+          },{
+              type: 'minimalist',
+              url_target: "_self",
+              z_index: 1031,
+              delay: 5000,
+              timer: 1000,
+              icon_type: 'image',
+              placement: {
+                  from: "bottom",
+                  align: "left"
+              },
+              animate: {
+                  enter: 'animated fadeInDown',
+                  exit: 'animated fadeOutUp'
+              },
+              mouse_over: 'pause',
+              newest_on_top: true,
+              template:
+              '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
+                  '<button type="button" aria-hidden="true" class="close" data-notify="dismiss">×</button>' +
+                  '<img data-notify="icon" class="img-circle pull-left" id="user-notif-img">' +
+                  '<span data-notify="title">{1}</span>' +
+                  '<span data-notify="message" id="user-notif-msg">{2}</span>' +
+                  '<a href="{3}" data-notify="url"></a>' +
+              '</div>'
+          });
+      }
+    </script>
+    {% endif %}
+
+    {# Scroll bar Categories #}
+    <script type="text/javascript">
+      $(document).ready(function () {
+          $('#scrolldown').click(function () {
+              $('#box').animate({
+                  scrollTop: '+=50'
+              }, 500);
+          });
+
+      });
+
+      $(document).ready(function () {
+          $('#scrollup').click(function () {
+
+              $('#box').animate({
+                  scrollTop: '-=50'
+              }, 500);
+          });
+      });
+    </script>
+
+  <!-- autocomplete street & zipcode -->
+  <script type="text/javascript">
+
+    function setOptions(results, prefix="") {
+
+      var parent = document.getElementById(prefix + "-autocomplete");
+
+      while(parent.children.length > 1) {
+        parent.removeChild(parent.lastChild);
+      }
+      
+      var options = document.createElement("div");
+      options.setAttribute("class", "autocomplete-items");
+      options.setAttribute("style", (results.length > 3) ? "height: 200px; overflow-y: scroll;" : "");
+      
+      results.map(function (result){
+        var option = document.createElement("div");
+        option.textContent = result.ADDRESS;
+        option.addEventListener('mousedown', function(event) {
+          document.getElementById("zipcode").value = result.POSTAL;
+          document.getElementById("street").value = result.ADDRESS;
+          parent.removeChild(parent.lastChild);
+        });
+        return options.appendChild(option);
+      });
+      parent.appendChild(options);
+    }
+    
+    document.getElementById("zipcode").addEventListener('input', function(event) {
+      if (!!this.value) {
+        fetch("{{ one_map_url }}/search?searchVal="+ this.value +"&returnGeom=Y&getAddrDetails=Y")
+          .then(function (response){
+            return response.json();
+          })
+          .then(function (onemap){
+            setOptions(onemap.results, "zipcode");
+          });
+      }
+    });
+
+    document.getElementById("street").addEventListener('input', function(event) {
+      if (!!this.value) {
+        fetch("{{ one_map_url }}/search?searchVal="+ this.value +"&returnGeom=Y&getAddrDetails=Y")
+          .then(function (response){
+            return response.json();
+          }).then(function (onemap){
+            setOptions(onemap.results, "street");
+          });
+      }
+    });
+
+    document.getElementById("zipcode").addEventListener('blur', function(event) {
+      var parent = document.querySelector("#zipcode-autocomplete")
+      if (parent.children.length > 1) {
+        parent.removeChild(parent.lastChild);
+      }
+    });
+
+    document.getElementById("street").addEventListener('blur', function(event) {
+      var parent = document.querySelector("#street-autocomplete")
+      if (parent.children.length > 1) {
+        parent.removeChild(parent.lastChild);
+      }
+    });
+
+  </script>
+
+    {% block custom_javascript %}{% endblock %}
+  </body>
+</html>

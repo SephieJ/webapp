@@ -1,0 +1,259 @@
+{% extends "layouts/main.html" %}
+{% block body %}
+  {# start main body #}
+  <div class="container sub-banner" id="resource-profile">
+    <div class="row">
+      {# start sidebar category #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Category</h4>
+            <input id="scrollup" type="image" width="170" height="20" name="scroll_up" src="{{ url_for('static', filename='assets/img/scrollup.png') }}">
+              <ul id="box" class="list-unstyled" style="height: 340px; overflow: hidden;">
+                {% for category in categories %}
+                  <li class="ellipsis" id="{{ category.name|safe }}">
+                    <a id="category_name" href="{{ url_for ('CategoryBP.view_category_page', category_id=category.id) }}">
+                      {{ category.name|safe }}
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            <input id="scrolldown" type="image" width="170" height="20" name="scroll_down" src="{{ url_for('static', filename='assets/img/scrolldown.png') }}">
+        </div>
+      </div> {# end sidebar category #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        <div class="col-lg-12">
+          <h5 class="center-page-header">Login</h5>
+          <hr class="header-line">
+        </div>
+
+        <div id="login-form">
+          <div class="col-md-6">
+            <div style="margin-top: 20px;"></div>
+            <p>
+              Login to get access to more content, chat with businesses and upload your own resources.
+            </p>
+            <span class="help-block">
+              <span>Email not yet verified?</span>
+              <a class="login-join" href="{{ url_for('UserBP.resend_email') }}" title="Join R2S!">
+                <span>Verify here</span>
+              </a>
+            </span>
+          </div>
+
+          <div class="col-md-6 join-form-main">
+            <br>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+              {% if messages %}
+                {% for category, message in messages %}
+                {% set rowloop = loop %}
+                  {% if loop.index == messages|length %}
+                  <div class="alert alert-flash alert-{{ category }} alert-dismissible" role="alert" style="margin-top: 10px;">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <!-- <strong>Title</strong> --> {{ message }}
+                  </div>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+            <form role="form" method="POST" action="{{ url_for('UserBP.login_page') }}" name="login_form">
+              {{ login_form.csrf_token }}
+              <input type="hidden" name="next" value="{{ next or '' }}">
+              <input type="hidden" name="rid" value="{{ rid or '' }}">
+              {% if login_form.email.errors %}
+              <div class="form-group has-error">
+              {% else %}
+              <div class="form-group">
+              {% endif %}
+                <label for="email">Email</label>
+                {{ login_form.email(class="form-control", placeholder="Enter email") }}
+                {% if login_form.email.errors %}
+                  {% for error in login_form.email.errors %}
+                    <span class="help-block">{{ error }}</span>
+                  {% endfor %}
+                {% endif %}
+              </div>
+
+              {% if login_form.password.errors %}
+              <div class="form-group has-error">
+              {% else %}
+              <div class="form-group">
+              {% endif %}
+                <label for="password">Password</label>
+                {{ login_form.password(class="form-control", placeholder="Enter password") }}
+                {% if login_form.password.errors %}
+                  {% for error in login_form.password.errors %}
+                    <span class="help-block">{{ error }}</span>
+                  {% endfor %}
+                {% endif %}
+                <span class="help-block">
+                  <a href="{{ url_for('UserBP.forgot_password') }}" title="Forgot your password?">
+                    <span>Forgot your password?</span>
+                  </a>
+                </span>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-block"> Log-in</button>
+
+              <div class="form-group">
+                <span class="help-block">
+                  <span>Don't have an account?</span>
+                  <a class="login-join" href="{{ url_for('UserBP.register_page') }}" title="Join R2S!">
+                    <span>Sign up here</span>
+                  </a>
+                </span>
+                <span>
+                  <div style="margin-right: 350px;" id="DigiCertClickID_EnlkXdot" data-language="en">
+                    <a href="https://www.digicert.com/ssl/"></a>
+                  </div>
+                </span>
+              </div>
+
+            </form>
+          </div>
+        </div>
+
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+
+
+  <div name="Archive" style="z-index:1051" class="modal fade DataTableModal" role="dialog">
+    <div class="modal-dialog">
+      <form method="POST" action="" role="form" files=true enctype="multipart/form-data" class="modal-content">
+        <div class="modal-header">
+        <!-- <input type="hidden" name="user_id"> -->
+          <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+          <h4 class="modal-title">Confirmation</h4>
+        </div>
+        <div class="modal-body">Are you sure do you want to delete this message thread?</div>
+        <div class="modal-footer customdlft">
+          <button name="Cancel" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button name="Confirm" type="submit" class="btn btn-primary">Yes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Unverified User Modal -->
+  <div id="unverifiedModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <!-- Unverified User Modal Content -->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title" style="font-weight: bold;">Your Account is Unverified</h4>
+        </div>
+        <div class="modal-body">
+          <p>Do you need to resend the verification email?</p>
+        </div>
+        <div class="modal-footer">
+          <form role="form" method="POST" action="{{ url_for('UserBP.resend_email') }}">
+            {{ resend_email_form.csrf_token }}
+            {{ resend_email_form.email(type="hidden", value=email) }}
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Yes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock%}
+
+{% block lib_javascript %}
+  <script src="{{ url_for('static', filename='assets/js/jquery.validate.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/additional-methods.js') }}"></script>
+{% endblock %}
+
+{% block custom_javascript %}
+<!-- Others must be on Last -->
+
+<script type="text/javascript">
+  $(document).ready(function(){
+
+    $("#categories > optgroup").filter(function(){
+      return this.id == "Others";
+    }).insertAfter("#categories > optgroup:last");
+
+    $("#box > li").filter(function(){
+      return this.id == "Others";
+    }).insertAfter($("#box > li:last"));
+
+  });
+</script>
+
+  {# DigiCert site seal #}
+  <script type="text/javascript">
+  var __dcid = __dcid || [];__dcid.push(["DigiCertClickID_EnlkXdot", "7", "m", "black", "EnlkXdot"]);(function(){var cid=document.createElement("script");cid.async=true;cid.src="//seal.digicert.com/seals/cascade/seal.min.js";var s = document.getElementsByTagName("script");var ls = s[(s.length - 1)];ls.parentNode.insertBefore(cid, ls.nextSibling);}());
+  </script>
+
+  {# Scroll bar Categories #}
+  <script>
+    $(document).ready(function () {
+        $('#scrolldown').click(function () {
+            $('#box').animate({
+                scrollTop: '+=50'
+            }, 500);
+        });
+
+    });
+
+    $(document).ready(function () {
+        $('#scrollup').click(function () {
+            $('#box').animate({
+                scrollTop: '-=50'
+            }, 500);
+        });
+    });
+  </script>
+
+  <script>
+    $("#login_form").validate({
+      rules: {
+        email: {
+          required: true,
+          email: true
+        },
+        password: {
+          required: true,
+          minlength: 6
+        },
+      },
+      messages: {
+        email: {
+          required: "Email Address is required."
+        },
+        password: {
+          required: "Password is required."
+        }
+      },
+      errorElement: "span",
+      errorPlacement: function(error, element) {
+        // Add the `help-block` class to the error element
+        error.addClass("help-block has-error");
+        if (element.prop("type") === "checkbox") {
+          error.insertAfter(element.parent("label"));
+        } else {
+          error.insertAfter(element);
+        }
+      },
+      highlight: function(element, errorClass, validClass ) {
+        $(element).parents(".form-group").addClass("has-error").removeClass("has-success");
+      },
+      unhighlight: function(element, errorClass, validClass) {
+        $(element).parents(".form-group").removeClass("has-error");
+      }
+    });
+  </script>
+
+  <script>
+    $(document).ready(function() {
+      if ("{{ email }}")
+        $("#unverifiedModal").modal("show");
+    });
+  </script>
+{% endblock %}

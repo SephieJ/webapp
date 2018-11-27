@@ -1,0 +1,45 @@
+{% extends "layouts/sign_up.html" %}
+{% block parent_layout %}
+<nav class="navbar navbar-expand-md bg-white navbar-light">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('UserBP.home_page') }}">
+      <img src="{{ url_for('static', filename='assets/img/logo_header.png') }}" alt="" class="img-responsive"></a>
+      <p class="m-2">Be part of the B2B resource sharing movement!</p>
+    </div>
+  </nav>
+  <div class="bg-light w-100">
+    <img src="{{ url_for('static', filename='assets/img/banner_head.jpg') }}" class="img-responsive">
+    <div class="container">
+      <div class="row"></div>
+    </div>
+  </div>
+
+
+     <div class="col-lg-12" style="font-size: 30px; padding-top: 100px; padding-bottom: 100px; text-align: center;">
+     You have successfully unsubscribed from receiving updates from Resources To Share.
+     <br>
+     Thank you!
+     </div>
+
+
+
+  {# footer #}
+  <footer>
+    <div class="copyright">
+      <div class="container text-center">
+        <span><a href="{{ url_for('CompanyBP.policies_page') }}" style="color: #91a4a9;">Privacy Policy</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;</span>
+        <span><a href="{{ url_for('CompanyBP.policies_page') }}" style="color: #91a4a9;">Terms of Use</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;</span>
+        <span><a href="{{ url_for('CompanyBP.about_us_page') }}" style="color: #91a4a9;">About Us</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;</span>
+        <span><a href="{{ url_for('FaqBP.question_page', faq_id=1) }}" style="color: #91a4a9;">FAQ</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;</span>
+        <span><a href="{{ url_for('CompanyBP.contact_us_page') }}" style="color: #91a4a9;">Contact Us</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        <!-- <span><a href="#" style="color: #91a4a9;">Events</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;</span>
+        <span><a href="#" style="color: #91a4a9;">News</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;</span>
+        <span><a href="#" style="color: #91a4a9;">Documentation Templates</a></span> -->
+      </div>
+      <br>
+      <div class="container text-center">
+        <span>Copyright © 2018 Resources to Share. All Rights Reserved.</span>
+      </div>
+    </div>
+  </footer> {# end footer #}
+{% endblock %}

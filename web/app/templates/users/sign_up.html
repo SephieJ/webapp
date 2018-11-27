@@ -1,0 +1,167 @@
+{% extends "layouts/sign_up.html" %}
+{% block parent_layout %}
+<nav class="navbar navbar-expand-md bg-white navbar-light">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('UserBP.home_page') }}">
+      <img src="{{ url_for('static', filename='assets/img/logo_header.png') }}" alt="" class="img-responsive"></a>
+      <p class="m-2">Be part of the B2B resource sharing movement!</p>
+    </div>
+  </nav>
+  <div class="bg-light w-100">
+    <img src="{{ url_for('static', filename='assets/img/banner_head.jpg') }}" class="img-responsive">
+    <div class="container">
+      <div class="row"></div>
+    </div>
+  </div>
+  <div class="py-4 bg-light text-dark">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-7">
+          <p>Resources to Share, R2S, is a B2B digital platform which offers businesses a simple yet powerful way to optimise and maximise their underutilised resources through collaboration with each other.</p>
+          <p class="mb-4">Be one of the first to sign up for free during our pre-launch and we will get in touch with you when the platform is ready!</p>
+          <h3 class="mb-4">Why sign up?</h3>
+          <div class="row text-center">
+            <div class="col-md-2 col-5 mx-2 mb-4">
+              <a>
+              <img src="{{ url_for('static', filename='assets/img/icon_monetise.png') }}" class="w-100" href="#"> </a>
+              <b>Monetize underutilized resources</b>
+            </div>
+            <div class="col-md-2 col-5 mx-2 mb-4">
+              <a>
+              <img src="{{ url_for('static', filename='assets/img/icon_reduceexpense.png') }}" class="w-100" href="#"> </a>
+              <b>Reduce capital expenditure on assets</b>
+            </div>
+            <div class="col-md-2 col-5 mx-2 mb-4">
+              <a>
+              <img src="{{ url_for('static', filename='assets/img/icon_handshake.png') }}" class="w-100" href="#"> </a>
+              <b>Increase business collaboration &amp; innovation</b>
+            </div>
+            <div class="col-md-2 col-5 mx-2 mb-4">
+              <a>
+              <img src="{{ url_for('static', filename='assets/img/icon_business.png') }}" class="w-100" href="#"> </a>
+              <b>Sustainable business practices</b>
+            </div>
+            <div class="col-md-2 col-5 mx-2 mb-5">
+              <a>
+              <img src="{{ url_for('static', filename='assets/img/icon_productivity.png') }}" class="w-100" href="#"> </a>
+              <b>Increased productivity &amp; growth</b>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-5 pb-0 p-4 bg-white">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-flash alert-{{ category }} alert-dismissible" role="alert" style="margin-top: 10px;">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <!-- <strong>Title</strong> --> {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+          {% endwith %}
+
+          <form method="POST" role="form" name="signup_form" id="signup_form">
+            {{ signup_form.csrf_token }}
+
+            {# Company Name #}
+            {% if signup_form.company_name.errors %}
+            <div class="form-group has-error">
+            {% else %}
+            <div class="form-group">
+            {% endif %}
+              <label for="company_name"><span class="text-red">*</span>Company Name</label>
+              {{ signup_form.company_name(class="form-control", placeholder="Enter your company name") }}
+              {% if signup_form.company_name.errors %}
+                {% for error in signup_form.company_name.errors %}
+                  <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            {# Business reg number #}
+            {% if signup_form.business_reg_number.errors %}
+            <div class="form-group has-error">
+            {% else %}
+            <div class="form-group">
+            {% endif %}
+              <label for="business_reg_number">Business Registration No.
+                <i class="fa fa-question-circle tooltip-icon" aria-hidden="true">
+                  <span class="tooltiptext">
+                    <ul class="nav">
+                      <li>UEN-LOCAL CO (e.g. 200312345A)</li>
+                      <li>UEN-OTHERS (e.g. T08FC1234A)</li>
+                      <li>UEN-BUSINESS (e.g. 52912345A)</li>
+                      <li>ASGD (e.g. A2500123J)</li>
+                      <li>ITR (e.g. 2001123456X)</li>
+                      <li>GSTN (e.g. M91234567X)</li>
+                    </ul>
+                  </span>
+                </i>
+              </label>
+
+              {{ signup_form.business_reg_number(class="form-control", placeholder="Enter your Business Registration No.", maxlength=11) }}
+              {% if signup_form.business_reg_number.errors %}
+                {% for error in signup_form.business_reg_number.errors %}
+                  <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            {# First name #}
+            {% if signup_form.first_name.errors %}
+            <div class="form-group has-error">
+            {% else %}
+            <div class="form-group">
+            {% endif %}
+              <label for="first_name"><span class="text-red">*</span>First Name</label>
+              {{ signup_form.first_name(class="form-control", placeholder="Enter your first name") }}
+              {% if signup_form.first_name.errors %}
+                {% for error in signup_form.first_name.errors %}
+                  <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            {# Last name #}
+            {% if signup_form.last_name.errors %}
+            <div class="form-group has-error">
+            {% else %}
+            <div class="form-group">
+            {% endif %}
+              <label for="last_name"><span class="text-red">*</span>Last Name</label>
+              {{ signup_form.last_name(class="form-control", placeholder="Enter your last name") }}
+              {% if signup_form.last_name.errors %}
+                {% for error in signup_form.last_name.errors %}
+                  <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            {# Email #}
+            {% if signup_form.email.errors %}
+            <div class="form-group has-error">
+            {% else %}
+            <div class="form-group">
+            {% endif %}
+              <label for="email"><span class="text-red">*</span>Company Email</label>
+              {{ signup_form.email(class="form-control", placeholder="Enter your company email") }}
+              {% if signup_form.email.errors %}
+                {% for error in signup_form.email.errors %}
+                  <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            <div aria-describedby="submit-tooltip" class="form-group">
+              <button class="btn btn-primary btn-block" type="submit"><span>Sign Up For Free</span></button>
+            </div>
+          </form>
+
+          <div class="form-group"> <small>By clicking Sign Up For Free, you agree to be bound by the TIR Data Protection Policy and the website’s.</small> <small><a class="R2S Data Protection &amp; Terms of Use" href="{{ url_for('CompanyBP.policies_page') }}">R2S Data Protection &amp; Terms of Use</a></small> </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

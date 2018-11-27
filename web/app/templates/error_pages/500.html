@@ -1,0 +1,141 @@
+{% extends "layouts/main.html" %}
+{% block head %}
+  <link href="{{ url_for('static', filename='assets/css/selectize.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='assets/css/selectize.default.css') }}" rel="stylesheet">
+{% endblock %}
+{% block body %}
+  {# start main body #}
+  <div class="container sub-banner" id="resource-profile">
+    <div class="row">
+      {# start sidebar category #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Category</h4>
+
+          <div class="form-group">
+            <select name="categories" id="categories" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);" multiple="multiple" data-placeholder="Search" style="width:100%;" tabindex="5">
+              {% for category in categories %}
+                <optgroup id="{{ category.name|safe }}">
+                  <option value="{{base_url}}/categories/{{ category.id }}">
+                    {{ category.name|safe }}
+                  </option>
+                </optgroup>
+              {% endfor %}
+            </select>
+            <div class="help-block with-errors"></div>
+          </div>
+
+          <input id="scrollup" type="image" width="170" height="20" name="scroll_up" src="{{ url_for('static', filename='assets/img/scrollup.png') }}">
+            <ul id="box" class="list-unstyled" style="height: 340px; overflow: hidden;">
+              {% for category in categories %}
+                <li class="ellipsis" id="{{ category.name|safe }}">
+                  <a id="category_name" href="{{ url_for ('CategoryBP.view_category_page', category_id=category.id) }}">
+                    {{ category.name|safe }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          <input id="scrolldown" type="image" width="170" height="20" name="scroll_down" src="{{ url_for('static', filename='assets/img/scrolldown.png') }}">
+
+          {% if current_user.is_authenticated %}
+          <br>
+          <h4>Wished Items</h4>
+          <ul class="list-unstyled">
+            {% for wishlist in wishlists %}
+              {% for wish_cat in wishlist.categories %}
+              <li>
+                <li><a href="{{ url_for('ResourceBP.view_wishlist_page', slug=wishlist.reference) }}">{{ wish_cat.main_category_name|safe }}</a></li>
+              </li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+          {% else %}
+          {% endif %}
+        </div>
+      </div> {# end sidebar category #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        <div class="col-lg-12" style="padding-top: 2em;">
+            <div>
+                <a href="#">
+                    <img class="img-responsive" src="{{ url_for('static', filename='assets/img/R2S_Banner_1.jpg') }}" alt="">
+                </a>
+            </div>
+            <div style="padding-top: 5em;">
+                <div class="error-page-body" style="margin: 0; font-size: 2.5em;">
+                    Oh no, it looks like something went wrong.
+                </div>
+                <div class="error-page-link" style="margin: 0; font-size: 2em;">
+                    We will look into it. Thanks for your understanding.
+                </div>
+                <div class="error-page-link" style="margin: 0; font-size: 2em;">
+                    Meanwhile, try <a href="">refreshing</a>.
+                </div>
+            </div>
+        </div>
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock %}
+
+{% block lib_javascript %}
+  <script src="{{ url_for('static', filename='assets/js/selectize.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/selectize_no_result_plugin.js') }}"></script>
+{% endblock %}
+
+{% block custom_javascript %}
+<!-- Others must be on Last -->
+
+<script type="text/javascript">
+  $(document).ready(function(){
+
+    $("#categories > optgroup").filter(function(){
+      return this.id == "Others";
+    }).insertAfter("#categories > optgroup:last");
+
+    $("#box > li").filter(function(){
+      return this.id == "Others";
+    }).insertAfter($("#box > li:last"));
+
+  });
+</script>
+
+<script>
+    $('document').ready(function() {
+      $("#toggle").on("click", function() {
+          $("#toggle.active_category").removeClass("active_category");
+          $(this).addClass("active_category");
+      });
+    });
+</script>
+
+  {# Search Categories #}
+  <script type="text/javascript">
+    // document.ready
+    $( document ).ready(function() {
+      $("#parent_category").hide();
+      $("#parent_category_label").hide();
+      $("#subcategory").hide();
+      $("#subcategory_label").hide();
+      initCategorySel();
+    });
+
+    // init category selectize
+    function initCategorySel() {
+      $('#categories').selectize({
+        plugins: ['remove_button', 'restore_on_backspace', 'no_results'],
+        maxItems: 1,
+        onChange: function(value) {
+          if(value !== null) {
+            $("#categories-error").hide();
+          } else {
+            $("#categories-error").show();
+          }
+        }
+      });
+    }
+  </script>
+
+{% endblock %}

@@ -1,0 +1,149 @@
+<div class="col-lg-10 col-md-10 center-page">
+        <div class="col-lg-12">
+          <h5 class="center-page-header pull-right"><a href="{{ url_for ('UserBP.user_company_page', company_id=user.company.id) }}">Company Details</a></h5>
+          <h5 class="center-page-header">Edit Profile</h5>
+          <hr class="header-line">
+        </div>
+
+        <div class="col-md-6 settings-content">
+          <form role="form" action="{{ url_for('UserBP.user_edit_profile') }}" method="POST" files=true enctype="multipart/form-data" name="edit_profile" id="edit_profile">
+            <a href="#" id="imgclick">
+              <div class="profile-avatar">
+                <label class="settings-profile-avatar" >
+                  {% if current_user.image_url %}
+                    <img id="profilepic" src="{{ current_user.image_url }}" alt="" class="center-block img-rounded">
+                  {% else %}
+                    <img id="profilepic" src="{{ url_for('static', filename='assets/img/avatar.png') }}" alt="" class="center-block img-rounded">
+                  {% endif %}
+                  <div class="profile-avatar-link">
+                      <i class="fa fa-camera" aria-hidden="true"></i>
+                  </div>
+                </label>
+              </div>
+            </a>
+            {{ user_form.image_url(id="imgupload", class="form-control", style="display:none;") }}
+            <div class="text-center small"><em>maximum of 2MB.</em></div>
+            <div class="text-center small"><em>Available formats (.JPG, .JPEG, .PNG)</em></div>
+            <div>
+              {% with messages = get_flashed_messages(category_filter=['profile']) %}
+              <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+              {% if messages %}
+                {% for message in messages %}
+                    {% set msg = message.split(';') %}
+                    <div class="alert alert-flash alert-{{ msg[1] }} alert-dismissible" role="alert" style="margin-top: 10px;">
+                      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      <!-- <strong>Title</strong> --> {{ msg[0] }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+              {% endwith %}
+            </div>
+
+            {{ user_form.csrf_token }}
+
+            <div class="form-group">
+              <label for="firstname"><span class="text-red">*</span>First Name</label>
+              {{ user_form.first_name(class="form-control", value=current_user.first_name) }}
+
+              <div class="help-block with-errors"></div>
+                {% if user_form.first_name.errors %}
+                    {% for error in user_form.first_name.errors %}
+                        <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="lastname"><span class="text-red">*</span>Last Name</label>
+              {{ user_form.last_name(class="form-control", value=current_user.last_name) }}
+
+              <div class="help-block with-errors"></div>
+                {% if user_form.last_name.errors %}
+                    {% for error in user_form.last_name.errors %}
+                        <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="email"><span class="text-red">*</span>Email</label>
+              {{ user_form.email(class="form-control", value=current_user.email, readonly=readonly) }}
+              <div class="help-block with-errors"></div>
+                {% if user_form.email.errors %}
+                    {% for error in user_form.email.errors %}
+                        <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="birthdate"><span class="text-red">*</span>Birthdate</label>
+              {% if current_user.birth_date %}
+                  {{ user_form.birth_date(class="form-control", value=current_user.birth_date.strftime('%d-%m-%Y')) }}
+              {% else %}
+                  {{ user_form.birth_date(class="form-control", placeholder="Birthdate") }}
+              {% endif %}
+              <div class="help-block with-errors"></div>
+                {% if user_form.birth_date.errors %}
+                    {% for error in user_form.birth_date.errors %}
+                        <span class="help-block" style="color: #a94442;">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="office_number"><span class="text-red">*</span>Office Number</label>
+              {% if current_user.landline_number %}
+                {{ user_form.office_number(class="form-control", value=current_user.landline_number, maxlength="8", type="number", size="8") }}
+              {% else %}
+                {{ user_form.office_number(class="form-control", placeholder="Office Number", maxlength="8", type="number", size="8") }}
+              {% endif %}
+              <div class="help-block with-errors"></div>
+                {% if user_form.office_number.errors %}
+                    {% for error in user_form.office_number.errors %}
+                        <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label for="mobile_number"><span class="text-red">*</span>Mobile Number</label>
+              {% if current_user.mobile_number %}
+                {{ user_form.mobile_number(class="form-control", value=current_user.mobile_number, maxlength="8", type="number", size="8") }}
+              {% else %}
+                {{ user_form.mobile_number(class="form-control", placeholder="Mobile Number", maxlength="8", type="number", size="8") }}
+              {% endif %}
+
+              <div class="help-block with-errors"></div>
+                {% if user_form.mobile_number.errors %}
+                    {% for error in user_form.mobile_number.errors %}
+                        <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group" aria-describedby="submit-tooltip">
+              {{ user_form.save(class="btn btn-primary") }}
+            </div>
+          </form>
+        </div>
+
+        <div class="col-md-6 settings-content" style="padding-top: 192px;">
+            <div class="form-group pull-left">
+              <label for="description">User Profile</label>
+              {% if current_user.description %}
+                {{ user_form.description(class="form-control", placeholder="Tell us something about yourself", rows="12", cols="100") }}
+              {% else %}
+                {{ user_form.description(class="form-control", placeholder="Tell us something about yourself", rows="12", cols="100") }}
+              {% endif %}
+
+              <div class="help-block with-errors"></div>
+                {% if user_form.description.errors %}
+                    {% for error in user_form.description.errors %}
+                        <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+      </div>

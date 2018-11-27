@@ -1,0 +1,126 @@
+{% extends "layouts/full-width.html" %}
+{% block body %}
+<div id="page_content">
+    <div id="page_header">
+        <div class="page-header">
+            <br />
+            <h1>Transaction Details</h1>
+        </div>
+    </div>
+
+    <div id="page_content_body_display">
+        <div class="text-left">
+            <form class="form-horizontal form">
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="date-added" class="col-sm-2  no-padding-right control-labels">Order ID:</label>
+                            <div class="col-sm-5">
+                                <label id="date-added">{{ transaction.id }}</label>
+                            </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="date-added" class="col-sm-2  no-padding-right control-labels">Reference Code:</label>
+                            <div class="col-sm-5">
+                                <label id="date-added">{{ transaction.reference_code }}</label>
+                            </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="user-id" class="col-sm-2  no-padding-right control-labels">Booking Start Date:</label>
+                            <div class="col-sm-5">
+                                <label id="user-id">{{ transaction.booking_start_date.strftime('%d-%m-%Y') }}</label>
+                            </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="user_type" class="col-sm-2  no-padding-right control-labels">Booking End Date:</label>
+                            <div class="col-sm-5">
+                                <label id="user_type">
+                                {{ transaction.booking_start_date.strftime('%d-%m-%Y') }}
+                                </label>
+                            </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="username" class="col-sm-2  no-padding-right control-labels">Buyer:</label>
+                            <div class="col-sm-5">
+                                <label id="email">{{ transaction.buyer['first_name'] }} {{ transaction.buyer['first_name'] }}</label>
+                            </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="username" class="col-sm-2  no-padding-right control-labels">Resource:</label>
+                            <div class="col-sm-5">
+                                <label id="email">{{ transaction.resource['name'] }}</label>
+                            </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="mobile_number" class="col-sm-2  no-padding-right control-labels">Price:</label>
+                            <div class="col-sm-5">
+                                <label id="email">{{ '${:,.2f}'.format(transaction.resource['price'] | float) }}</label>
+                            </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="landline_number" class="col-sm-2  no-padding-right control-labels">Quantity:</label>
+                            <div class="col-sm-5">
+                                <label id="landline_number">{{ transaction.quantity }}</label>
+                            </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="landline_number" class="col-sm-2  no-padding-right control-labels">Status:</label>
+                            <div class="col-sm-5">
+                                <label id="landline_number">{{ transaction.status }}</label>
+                            </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="image_url" class="col-sm-2  no-padding-right control-labels">Image:</label>
+                            {% if transaction.image_url == "" %}
+                            <div class="col-sm-5">
+                                <label id="image_url">No Image</label>
+                            </div>
+                            {%- endif -%}
+                    </div>
+                </div>
+
+                {% if transaction.image_url != "" %}
+                <div class="col-md-12 text-center" style="margin-bottom: 25px">
+                    <img src="{{ transaction.image_url }}" width="50%" height="50%" />
+                </div>
+                {% endif %}
+
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="pull-left">
+                        &nbsp;&nbsp;&nbsp;<a class="btn btn-primary" href="{{ url_for('UserTransactionBP.view_transactions_page') }}" id="btnSuccess"><i class="fa fa-arrow-left bigger-100"></i> Back to My Orders</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

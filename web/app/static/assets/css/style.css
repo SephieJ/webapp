@@ -1,0 +1,32 @@
+.img-responsive {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    width: 100%;
+}
+
+.navbar-brand img {
+    width: 288px;
+}
+
+.text-red {
+    color: #a94442;
+}
+
+.form-group {
+    font-weight: bold;
+}
+
+.help-block {
+    color: #a94442;
+    font-weight: normal;
+}
+
+.terms {
+    text-align: left;
+    font-weight: bolder;
+}
+
+.content {
+    text-align: justify;
+}

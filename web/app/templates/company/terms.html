@@ -1,0 +1,428 @@
+{% extends "layouts/sign_up.html" %}
+{% block parent_layout %}
+<nav class="navbar navbar-expand-md bg-white navbar-light">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('UserBP.home_page') }}">
+      <img src="{{ url_for('static', filename='assets/img/logo_header.png') }}" alt="" class="img-responsive"></a>
+      <p class="m-2">Be part of the B2B resource sharing movement!</p>
+    </div>
+  </nav>
+  <div class="bg-light w-100">
+    <img src="{{ url_for('static', filename='assets/img/banner_head.jpg') }}" class="img-responsive">
+    <div class="container">
+      <div class="row"></div>
+    </div>
+  </div>
+
+  <div class="py-4 bg-light text-dark">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <p class="terms"><strong><h4>Terms of Use</h4></strong></p>
+
+
+          <p class="terms">I. List of Possible Violations of our Policies:</p>
+
+          <p class="content">Administrators of R2S will be entitled to suspend, terminate, block usage, cancel and/or amend your advertisements, postings and listing, or take other appropriate actions against your activities and/or account without prior notice if you violate one or more of our policies, or if we are of the view that such actions by us are reasonably required in order to uphold our policies.</p>
+
+          <p class="content">The list of violations below sets out the violations of our policies (which are non exhaustive) which you should avoid.</p>
+          <p class="content">
+          1. Ad spamming:  Posting of multiple identical or similar advertisements with the intention of flooding particular site’s categories and search results.
+          <br><br>
+          2. Any reference or promotion of illegal activities using our site is strictly prohibited. Certain advertisements  will not be permitted or allowed by us. These include (but are not limited to):
+          <br>
+          &nbsp;&nbsp;&nbsp;
+          a. Ads referring to online or offline gaming or gambling
+          <br>
+          &nbsp;&nbsp;&nbsp;
+          b. Ads referring to the sale or transaction of virtual currencies (i.e., PayPal, Bitcoins, E-currencies, etc) or real currencies (notes and coins) of any country
+          <br>
+          &nbsp;&nbsp;&nbsp;
+          c. Ads referring to prescription or supply of medicinal products and medical devices (unless by persons holding valid licences)
+          <br>
+          &nbsp;&nbsp;&nbsp;
+          d. Ads referring to credit card and loan application assistance offered by individuals
+          <br>
+          &nbsp;&nbsp;&nbsp;
+          e. Ads referring to sale or supply of arms and explosives
+          <br>
+          &nbsp;&nbsp;&nbsp;
+          f. Ads referring to sexual services or transactions
+          <br>
+          &nbsp;&nbsp;&nbsp;
+          g. Ads referring to sale and supply of chewing gums
+          <br>
+          &nbsp;&nbsp;&nbsp;
+          h. Ads referring to human organ donation or transplant (within or outside Singapore)
+          <br>
+          &nbsp;&nbsp;&nbsp;
+          i. Ads referring to professional services such as medical services or legal services
+          <br>
+          &nbsp;&nbsp;&nbsp;
+          j. Ads referring to the resale of events tickets where the terms and conditions of the tickets imposed by the event organiser specifically prohibit resale
+          <br>
+          &nbsp;&nbsp;&nbsp;
+          k. Ads referring to or in connection with the commission (or assistance to the commission) of an offence or the breach of laws and regulations
+          <br>
+          &nbsp;&nbsp;&nbsp;
+          l. Ads which violate our Content Guidelines as set out in Part VII of this Terms of Use
+          <br><br>
+          3. Copying/pasting other member’s ads:  Copying part of or all of other member's advertisement item details and using them for your own-posted ads.
+          <br><br>
+          4. Multiple accounts:  The same member creates and manages more than one (1) account, with the intention of spamming the website by posting the same set of ads over and over again on all the other account/s.
+          <br><br>
+          5. Duplicate ads:  Posting two (2) or more of the same active advertisement, under one Main Category.
+          <br><br>
+          6. Multiple ads in different categories:  Creating multiple advertisement in the different categories for the advertisement of the same item by you.
+          <br><br>
+          7. Identity theft:  Creating a member account using another individual's personal information for the purposes of gaining trust and/or obtaining information or materials from third parties for your own benefit.
+          <br><br>
+          8. Keyword stuffing:  Loading/using repetitive, excessive, and unrelated keywords and/or meta tags in your advertisements.
+          <br><br>
+          9. Misleading information in ads:  you intentionally or knowingly use or include incorrect  or misleading information in your advertisements such as (but not limited to) pricing, condition of goods, and images unrelated to the advertisement including thumbnails.
+          <br><br>
+          10. Private message spam:  Sending unsolicited messages to other registered members through PM with the intention of advertising/promoting or offering products, services, or businesses.
+          <br><br>
+          11. Scams or illegal ads:  Advertisements posted with the intention to or having the effect of defrauding/scamming other registered members.
+          <br><br>
+          12. Pirated content or images:  Using content materials or images from other advertisements in your own posted ads.
+          <br><br>
+          13. Undeleted sold or depleted items:  Sold, or depleted, items should be declared as sold/unavailable item without delay by clicking the Deactivate button right after a successful transaction. Advertisements for discontinued or unavailable services/businesses should also be deactivated.
+          <br><br>
+          14. Wrong category ads:  Advertisements that are posted under incorrect or unrelated categories with the intention of flooding particular site’s categories and search results .
+          <br><br></p>
+
+          <p class="terms">II. Responsibilities of all Users and Members</p>
+          <p class="content">
+          1. You agree to follow all applicable laws, rules and regulations in your use of our website and services . As a member of R2S, you shall not use the system to violate any applicable laws, rules and regulations (local and/or international).
+          <br><br>
+          2. You shall respect the rights of all other users and you shall not use our services to violate any laws, rules or regulations or harm other persons' interest or infringe their rights.
+          <br><br>
+          3. You shall be responsible exclusively for all the content you contribute, upload, and supply to our website and system. The opinions, suggestions, expressions or statements expressed through your submitted posts to our website and system are your personal views and statements,  and they do not represent in any way the views of R2S. We disclaim any and all responsibility associated with or connected with the content you contribute and supply to our website and system.
+          <br><br>
+          4. You shall respect the privacy of all users of our system. You shall not collect, disclose, or use any personal information of other individuals without their permission or consent.
+          <br><br>
+          5. You shall not send unsolicited commercial communications to other users of R2S. You shall, likewise, refrain from using any other form of communication to send unsolicited SPAM to any person who is linked to our site.
+          <br><br>
+          </p>
+
+          <p class="terms">III. System Usage Policies</p>
+          <p class="content">
+          1. As a member of R2S, you are responsible for the security of your own member account including its username and password.  No member is allowed to share his/her username or password with another user.  Furthermore, no member or registrant will be allowed and/or permitted to adopt a username which is or may be considered foul, obscene, racist, hateful, immoral, inflammatory, or otherwise against public morality or order.
+          <br><br>
+          2. Each user is generally allowed only one (1) active member account.
+          <br><br>
+          3. Membership in, and usage of, R2S is absolutely voluntary. Therefore any membership, access and/or usage of any services provided by R2S is an admission that you have read, understood and agreed to all the rules and policies set by R2S.
+          <br><br>
+          </p>
+
+
+          <p class="terms">IV. Feedback Posting Rules</p>
+          <p class="content">
+          1. Feedback will be allowed to be given to any member only after an exchange of goods and/or services has been made. Any feedback given to any member prior to any transaction is considered as a violation and may be taken out, removed and/or erased by R2S.
+          <br>
+          2. As an exception, a no-rating feedback (comment-only) may be given related to an agreement for a transaction that was not completely performed (no signed contracts and/or down payments involved) by the parties. INCOMPLETE OR FAILED TRANSACTIONS BELONG TO THIS CATEGORY.
+          <br><br>
+          3. Comment-only feedback is displayed on the member's account but does not affect the overall feedback score of the member.
+          <br><br>
+          4. Only feedback related to the transaction is allowed.  Personal comments about the seller or anything  of a similar personal nature should only be left as a no-rating or comment-only feedback.
+          <br><br>
+          5. Only one (1) feedback is allowed per transaction.  A transaction involving a number of items is still considered as only one (1), or a single, transaction.
+          <br><br>
+          6. As an exception, additional feedback is still allowed within the warranty period of the item and/or service.  This includes feedback regarding after sales service as agreed upon by the transacting parties.
+          <br><br>
+          7. Members receiving a feedback can file a dispute, regarding any feedback pertaining to him/her/it, using the Feedback Dispute Resolution process.
+          <br><br>
+          8. R2S reserves the right to delete any feedback or comment that, in its own opinion, violates or tends to violate any of the foregoing rules.
+          <br><br>
+          </p>
+
+
+          <p class="terms">V. Community Forum Rules</p>
+          <p class="content">
+          1. Please read the General Rules and System Usage Policies as posted above.  Membership in, or usage of services provided by, R2S is deemed as an admission that you have read, understood and agreed to all the rules and policies set forth herein including any and all amendments and/or updates thereto.
+          <br><br>
+          2. Do not post advertisements in the community forum.  Keep all advertisements in the main website.  Posting unrelated links of your website is one form of an advertisement.
+          <br><br>
+          3. Only post topics in the correct category.
+          <br><br>
+          4. Avoid off-topic discussions and instead create a separate topic if necessary.  Also avoid posts that will "hijack" the discussion from the original topic.  Posts preventing other members to join the discussion must likewise be avoided (e.g. posts that can be understood by some or only a few members).
+          <br><br>
+          5. Avoid creating a new topic which has already been discussed.  Use the search functionality of the forum to check and verify if an existing and/or related topic already exists.  Any member can only create a similar topic to an existing one only if that existing topic is already archived.
+          <br><br>
+          6. Avoid very short and non-sensical posts.  Furthermore, avoid excessive use of smilies or emoticons. Smilies or emoticons must not exceed twenty-five percent (25%) of your message post (an emoticon is considered as a word).  Therefore, message posts made up of only emoticons are not allowed.
+          <br><br>
+          7. The following writing styles for the forum title and/or message posts are strictly prohibited as they make forum posts difficult to read:
+          <br>
+          &nbsp;&nbsp;&nbsp;
+          a. Using ALL CAPS or UPPER CASE LETTERS
+          <br>
+          &nbsp;&nbsp;&nbsp;
+          b. Using camel-case text (ThiS Is a sAMplE oF CamEl cASe TeXt)
+          <br>
+          &nbsp;&nbsp;&nbsp;
+          c. Using text speak, text lingo, or SMS language (Ds s @n xmpl 0f TxT l1ng0!)
+          <br>
+          &nbsp;&nbsp;&nbsp;
+          d. Putting s p a c e s, p.e.r.i.o.d.s, or sp3c!@l ch@r@c+ers in between letters
+          <br>
+          &nbsp;&nbsp;&nbsp;
+          e. And using other forms of writing that make forum posts difficult to read
+
+          <br><br>
+          8. Only use descriptive topic title/subject relevant to the post.
+          <br><br>
+          9. Posting same messages at different topics multiple times is considered spam and is strictly prohibited.  Furthermore, multiple posts in succession in a topic is strictly NOT allowed unless you are quoting responses.  If you need to add something in your previous and recent post, edit that post instead.
+          <br><br>
+          10. Articles copied from other websites must always contain an attribute link to the address of the copied article.  Copy/Paste articles from other websites NOT worthy for discussion or constitute copyright infringement are NOT allowed.
+          <br><br>
+          11. Avoid arguing any moderator-related actions (e.g. closing a topic, moving a topic to a new category, etc.) and penalties given by administrators to reported violations in public.  Any disagreement to moderator-related actions must first be addressed to the moderator or administrator concerned privately (via a private message or email). Unresolved issues related to moderation must then be submitted to the administrator (or other administrators) supported by the positions of both sides.  However, having an argument or debating, disagreeing, or discussing opposing or differing viewpoints against the PERSONAL opinions, suggestions or idea of moderators and administrators are ALLOWED.
+          <br><br>
+          12. Avoid adding irrelevant images to forum posts.
+          <br><br>
+          13. Be sensible, polite and use common sense when joining any discussion.  Show respect to other members so that they can show respect to you in return.  Discussions should be kept within the spirit of fun, cooperation and information dissemination.
+          <br><br>
+          14. Avoid making personal attacks in the posts to any members.  Any personal attacks whether explicit or implied will not be tolerated.
+          <br><br>
+          15. Any and all posts on the forum which, in the opinion of R2S  violates or tends to violate these rules and policies may be removed and the author thereof sanctioned with the appropriate penalty as determined exclusively by R2S.
+          <br><br>
+          </p>
+
+
+          <p class="terms">VI. Our Service</p>
+          <p class="content">
+          R2S aims to be a family-safe website. To ensure this, we require all members and users to observe our rules and follow our guidelines.
+          <br><br>
+          As a community-based system, R2S aims for a "self-moderated" community wherein members are encouraged to moderate their own posts, allowing and helping others to moderate theirs. This way, it will be easier to manage a continually growing community. Aside from the Administrators, the members manage the community as well. All members are encouraged to report anything they believe is a violation of these rules and policies.
+          <br><br>
+          Your use of R2S is voluntary. We encourage you, but do not require, to register and become a member of the site. When you access our website, use our services or sign up for a membership, you agree to abide by all our rules and policies (including any amendments & addendums), which you affirm to have fully read and understood. Necessarily, this includes these Terms and Conditions, Responsibilities of all Users and Members, Content Guidelines, Posting Classified Ads Guidelines, and all other policies found in our Policies Page.
+          <br><br>
+          We assume that you are an adult and have the legal capacity to enter into valid contracts. As a policy, we do not market our services to minors. Upon learning that a minor has provided us his/her personal information, we immediately delete the account and all the minor’s personal information, from our system. However, this deletion does not cover the information collected during the course of the minor’s use of our services and it does not guarantee that the information provided by the minor was not used, prior to the deletion.
+          <br><br>
+          </p>
+
+
+          <p class="terms">VII. Content Guidelines</p>
+          <p class="content">
+          You must ensure that all content you post on our site must comply with these Rules and shall not contain:
+          <br><br>
+          1. Adult explicit content or those of a sexual nature, or any material which the dominant theme appeals to lustful interest as a whole, and satisfies only the craving for gratuitous sex, including the following:
+          a. Nudity meant simply to titillate and has little aesthetic value;
+          b. Portrayal of sexual activity;
+          c. Images of the genitalia; and,
+          d. Any other material, which in our opinion, may be considered as adult content or sexual in nature.
+          <br><br>
+          2. Material depicting excessive violence, such as that which:
+          <br> &nbsp;&nbsp;&nbsp;
+          a. Glorifies or glamorizes violence;
+          <br> &nbsp;&nbsp;&nbsp;
+          b. Satisfies the craving for gratuitous violence;
+          <br> &nbsp;&nbsp;&nbsp;
+          c. Contains detailed or prolonged images of other kinds of violence;
+          <br> &nbsp;&nbsp;&nbsp;
+          d. Glorifies criminals or endorses criminal behavior; and,
+          <br> &nbsp;&nbsp;&nbsp;
+          e. Any other material, which in our opinion, is offensive in nature or depicts excessive violence.
+          <br><br>
+          3. Foul, offensive, profane or improper language;
+          <br><br>
+          4. Racist, hateful, discriminatory, inflammatory or flaming comments (including comments which are discriminatory or offensive in respect of other person's religious or policital beliefs, ethnicity, gender, age, occupation, and nationality);
+          <br><br>
+          5. Reference to any illegal material or activity;
+          <br><br>
+          6. Products or services that are prohibited or illegal;
+          <br><br>
+          7. Confusing, deceptive or misleading information; or,
+          <br><br>
+          8. Material which infringes the intellectual property rights of third parties.
+          <br><br>
+          </p>
+
+
+          <p class="terms">VIII. R2S Membership</p>
+          <p class="content">
+          1. Signing up:
+          <br> &nbsp;&nbsp;&nbsp;
+          a. Each individual user is generally allowed only one (1) active member account.
+          <br> &nbsp;&nbsp;&nbsp;
+          b. When choosing a name or alias, please do not select one which may be considered foul, obscene, racist, hateful, or inflammatory.
+          <br><br>
+          2. Your Duties and Responsibilities as an R2S Member:
+          <br>
+          You are responsible for ensuring that your account is not accessed without your authority. We strongly advise against sharing your login credentials (username, email, mobile number and password) with others. All activity arising from the use of your credentials will be your personal responsibility and you shall be responsible for any harm suffered by us or third parties caused by your use of your account.
+          <br><br>
+          3. If We Deactivate or Archive Your Account:
+          <br> &nbsp;&nbsp;&nbsp;
+          a. Your membership will be deactivated if:
+          <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          i. You have not signed in at least once for the past twelve (12) months; or,
+          <br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          ii. The corresponding e-mail address, assigned to your account, rejects or bounces our e-mails due for any reason including the following:
+          mailbox full;
+          e-mail account deactivated;
+          e-mail account suspended;
+          e-mail domain inaccessible;
+          mailserver with technical problems; and,
+          e-mail requiring verification
+          <br> &nbsp;&nbsp;&nbsp;
+          b. In case your account got deactivated, you will be informed accordingly when you sign in again. To reactivate your account, you just need to sign in again using your login credentials (username, email, mobile number and password).
+          <br> &nbsp;&nbsp;&nbsp;
+          c. Your membership will be archived if you fail to sign in for six (6) consecutive months. You will have all your active advertisements automatically archived.
+          <br><br>
+          </p>
+
+
+          <p class="terms">IX. Posting Classified Ads</p>
+          <p>
+          1. All advertisements you post must conform to our policies and guidelines outlined here.
+          <br><br>
+          2. Posting of advertisements for free is merely a privilege. We may, at any time and at our sole discretion, without need of prior notice, remove or disallow this privilege. We also reserve the right to impose the applicable fees prior to allowing any advertisement to be displayed in our site.
+          <br><br>
+          3. If, in our opinion, your advertisements do not conform or have a tendency to violate our rules or any of our guidelines, you authorize R2S or any of our Administrators to take any corrective action with respect to your advertisement. In particular, we may delete, suspend, or return your advertisement to make it compliant.
+          <br><br>
+          4. One Product per Ad. You may not post multiple unrelated items in one (1) advertisement.
+          <br><br>
+          5. No double entries or duplicate ads. You are allowed only one (1) advertisement for the same product or service. You are allowed to post an advertisement similar to your previous ad, only if it is already been deleted or expired.  Deleted or expired advertisements may be reposted.
+          <br><br>
+          6. Advertisements must be posted in the correct category or group where the item is available for lease or sale. If your advertisement falls under more than one category, you must select the best category or group to post your advertisement.
+          <br><br>
+          7. Any advertisement that is no longer valid (e.g. sold-out items, jobs filled-in) should be deactivated.
+          <br><br>
+          8. You may not advertise any product or service which violates the intellectual property rights of any third party.   This includes counterfeit goods, including fake replicas or unauthorized copies.
+          <br><br>
+          9. Misleading or false information in advertisements such as incorrect or inaccurate pricing or terms and conditions are strictly prohibited.
+          <br><br>
+          10. All advertisements must comply with all product registrations and licensing requirements under applicable laws, rules and regulations before they may be posted.
+          <br><br>
+          </p>
+
+
+          <p class="terms">X. Protecting your Privacy</p>
+          <p class="content">
+          1. Overall Privacy
+          <br>
+          At R2S, we value your privacy. Rest assured that the information you provide when you use our websites and related applications will be collected and used in the manner in accordance with the applicable laws and regulations and as stated in this Terms of Use.
+          <br><br>
+          2. What Information we Collect
+          <br>
+          The information we collect depends on whether you are a visitor or a member.
+          <br>&nbsp;&nbsp;&nbsp;
+          a. If you are a visitor, you provide us with information of what service you use and how you use it. These may include:
+          <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          i. Log information, such as information on how you use our service (e.g. time or duration of your use), browser cookies, web beacons;
+          <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          ii. Computer information, such as IP address, operating system version, device settings, hardware model, device identifiers, and Subscriber Identity Module (SIM) number for some mobile devices, if available; and,
+          <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          iii. Other information.
+          <br>&nbsp;&nbsp;&nbsp;
+          b. If you are a member, aside from the information above, during your registration with use you also provide us with your name, mobile number, and email address. These pieces information serve as our point of contact with you. Our registration forms and profile update forms also ask for other information, such as birthday, job title and company details. You have the option to provide us with these pieces of information or not.
+          <br>&nbsp;&nbsp;&nbsp;
+          c. To maintain the accuracy of members’ personal information, you may access your information with us at any time and change any inaccuracies you may find by updating your profile. Members also have the option to delete their information from our database by updating their profile or sending us a support ticket to deactivate their account. 
+          <br><br>
+          3. How we Use your Personal Information
+          <br>
+          All information that you provide us, including information you post in the site, may be collected and used by us.  By using our services and providing information to us, you are deemed to consent to the collection, use, transfer and storage of the information ( both within and outside Singapore where applicable). We assure you that our actions concerning your personal information will be guided by the law and this Personal Data Protection Policy.
+          <br>&nbsp;&nbsp;&nbsp;
+          a. The information you provide us (including personal data) may be used in any of the following manner for the purposes stated therein:
+          <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          i. To provide better and customized services to you.
+          <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          ii. To carry out necessary technical tracking and maintenance functions on our website. We may use your cookies which are small text files that our Web server place on your computer hard drive as unique identifiers which will enable  us to track usage patterns and deliver customized content to you. Our cookies have an expiration date.
+          <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          iii. To provide communications services to our members. You may receive e-mails, SMS and Push Notifications (in mobile apps) regarding items posted in our system. We also send additional announcements about products, services, special deals and newsletters. Members may opt not to receive these types of communications by opting out in your user Profile page.
+          <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          iv. We may also use the information we collect from you to improve our products and services and to develop new ones.
+          <br>&nbsp;&nbsp;&nbsp;
+          b. Subject to applicable laws and regulations, we may share, transfer, and disclose the information we collect from our members, to the following:
+          <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          i. Companies that form part of our group of companies, to enable them to offer or improve their respective services or products;
+          <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          ii. Service providers that help us provide our services, to the extent needed to perform their duties and their functions;
+          <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          iii. Government authorities, at their request and only when legally required to do so; and,
+          <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          iv. Purchasers or potential purchasers of our rights and obligations relating to the services we provide. In this regard, all information collected are deemed assets that may be transferred to such third parties.
+          Where the information will be transferred by us outside Singapore, we will ensure that the information transferred overseas will be offered a level of protection which is comparable with that under the Personal Data Protection Act of Singapore.
+          <br>&nbsp;&nbsp;&nbsp;
+          c. The information we collect may also be shared, transferred and disclosed when this is necessary:
+          <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          i. To protect the rights and interests of R2S, business partners, customers or third parties, as may be required and permitted by law; and
+          <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          ii. To pursue your legitimate interests, as may be required or permitted by law.
+          <br>&nbsp;&nbsp;&nbsp;
+          d. Advertisement in different media. Images and information uploaded or posted may be used to advertise R2S and its services in different media (i.e., Above-the-line, Below-the-line, Search Engine Marketing, Social Media advertising). Information may be used for the conduct of promotions and advertisements through e-mails, SMS and Push Notifications.
+          <br>&nbsp;&nbsp;&nbsp;
+          e. Location identification. Through information provided by the device you use to access our Apps and services, we are provided with IP addresses and other locational information. An IP Address is a unique identifier that identifies your computer or device in the Internet. These information are used to identify the location of the device (i.e., town, city and country), and these are added to all data that are submitted to the system.
+          <br>&nbsp;&nbsp;&nbsp;
+          f. Market analysis. The information we collect from users may also be used for assessment, record keeping, market analysis and generation of reports.
+          <br><br>
+          4. How We Secure your Personal Information.
+          <br>&nbsp;&nbsp;&nbsp;
+          We endeavor to protect your information by using secure servers. Sufficient physical and technical methods and procedures are employed to safeguard and secure the information from unauthorized or unlawful processing. We have no control, however, over any information you provide when you leave our Apps. Our Apps offers listings, chats, forums and/or message boards, as well as links to third-party websites. When you click on these links, you effectively leave our Apps.
+          <br><br>&nbsp;&nbsp;&nbsp;
+          To ensure your protection, we encourage you to read their privacy policies. We also have no control over third-party advertising companies that serve ads when you visit our Apps. They may use information about your visits to our Apps and other websites in order to provide advertisements about goods and services that may be of interest to you. While we will not provide them with your name, address, email address, or telephone number, we do not control the manner by which they collect such information.
+          <br><br>&nbsp;&nbsp;&nbsp;
+          For queries relating to your personal data, feel free to contact our  Data Protetcion Officer at dpo@resourcestoshare.com.
+          <br><br>
+          </p>
+
+
+          <p class="terms">XI. Changes in our policies and services</p>
+          <p class="content">
+          Note that we may modify these rules and policies at any time without prior notice to you. Any modification will be effective immediately upon posting. By using and/or accessing our system, you are deemed to have agreed to our rules and policies, as modified from time to time.
+          <br><br>
+          We may, from time to time and without notice to you, change, improve or terminate this system. Changes shall be effective immediately upon posting in the site.
+          <br><br>
+          </p>
+
+
+          <p class="terms">XII. Violations of our Rules</p>
+          <p class="content">
+          1. Reporting Violations
+          <br>&nbsp;&nbsp;&nbsp;
+          a. If you believe a violation of our rules has occurred, we encourage you to report it immediately by clicking on the “Report” icon located throughout the site; filling in the form and submitting the same.
+          <br>&nbsp;&nbsp;&nbsp;
+          b. Refrain from making multiple reports of the same violation as this may only cause delay in our investigation.
+          <br><br>
+          2. Consequences of Violating our Rules
+          <br>&nbsp;&nbsp;&nbsp;
+          a. We may suspend your usage of the system if, in our sole opinion, you have violated or your actions tend to violate any law, rules, regulations or our policies without prior notice.
+          <br>&nbsp;&nbsp;&nbsp;
+          b. We may also delete any and all of your content (such as posts, advertisements, replies and comments) that, in our sole opinion, violate or tend to violate any law, rule, regulation, or our policies without prior notice.
+          <br><br>
+          </p>
+
+
+          <p class="terms">XIII. Warranties</p>
+          <p class="content">
+          R2S DISCLAIMS ALL EXPRESS AND IMPLIED WARRANTIES WITH REGARD TO THE CONTENT, INFORMATION, SERVICES, AND MATERIALS CONTAINED ON THIS SYSTEM, INCLUDING WITHOUT LIMITATION ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. ALL SUCH INFORMATION, SERVICES, AND MATERIALS ARE PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT ANY WARRANTY OF ANY KIND.
+          <br><br>
+          </p>
+
+
+          <p class="terms">XIV. Disclaimer</p>
+          <p class="content">
+          IN NO EVENT SHALL R2S BE LIABLE FOR DAMAGES THAT MAY ARISE FROM OR BE IN CONNECTION WITH YOUR USE OF OUR SYSTEM, INCLUDING BUT NOT LIMITED TO DIRECT, SPECIAL, INDIRECT, PUNITIVE, INCIDENTAL, EXEMPLARY OR CONSEQUENTIAL DAMAGES,SUCH AS (BUT NOT LIMITED TO)LOSS OF USE, LOSS OF BUSINESS OR BUSINESS OPPORTUNITY, DATA OR PROFITS,, WHETHER BASED ON BREACH OF CONTRACT, TORT (INCLUDING NEGLIGENCE), PRODUCT LIABILITY OR OTHERWISE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. THE MEMBER AND/OR USER ACKNOWLEDGES AND AGREES THAT THE LIMITATIONS SET FORTH ABOVE ARE FUNDAMENTAL ELEMENTS OF THIS AGREEMENT AND THE SYSTEM WOULD NOT BE PROVIDED TO YOU IN THE ABSENCE OF SUCH LIMITATIONS.
+          <br><br>
+          R2S may and can include links to external systems in which R2S has no responsibility of any kind on these systems. The use and/or access of these external systems are completely and solely at your own risk.
+          <br><br>
+          </p>
+
+
+          <p class="terms">XV. Indemnity</p>
+          <p class="content">
+          You are solely responsible for your actions or omissions. We do not assume any responsibility for any consequence of your actions or omissions, whether or not you acted based on any content, information, service or other material found in our system. You agree to indemnify and hold us free and harmless against any other person in respect of all claims, actions, suits, damages, losses, expenses and costs (including professional advisers' costs) arising from or in connection with your use of our system.
+          <br><br>
+          </p>
+
+
+          <p class="terms">XVI. Governing Law and Dispute Resolution</p>
+          <p class="content">
+          This Terms of Use shall be governed by and construed in accordance with the law of Singapore. Any dispute arising out of or in connection with this Terms of Use shall be submitted to the exclusive jurisdiction of the courts of Singapore.
+          <br><br>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

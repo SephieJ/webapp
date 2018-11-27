@@ -1,0 +1,42 @@
+<div class="item col-lg-3 col-md-4 col-sm-6 col-xs-6">
+  <div class="thumbnail">
+    <a href="{{ url_for ('ResourceBP.resource_page', resource_id=resource.id) }}">
+      <div class="img-wrap">
+        <img alt="" class="group list-group-image img-responsive" src="{{ resource.image_url or 'http://placehold.it/400x400/000/fff' }}">
+      </div>
+    </a>
+
+    {% if not current_user.is_authenticated %}
+      <a href="{{ url_for('UserBP.login_page', next=request.path, rid=resource.id) }}">
+        <div class="rs-card-like" data-id="{{ resource.id }}">
+          <i class="fa fa-bookmark-o" aria-hidden="true"></i>
+        </div>
+      </a>
+    {% else %}
+      {% if resource in user_favorites %}
+        <div class="user-rs-card-like" data-id="{{ resource.id }}" style="display:block">
+          <i class="fa fa-bookmark" aria-hidden="true" style="color:#f97106"></i>
+        </div>
+      {% else %}
+        <div id="bookmark-fill-{{ resource.id }}" class="bookmark-fill rs-card-like" data-id="{{ resource.id }}">
+          <i class="fa fa-bookmark" aria-hidden="true"></i>
+        </div>
+      {% endif %}
+       <div id="bookmark-border-{{ resource.id }}" class="bookmark-border rs-card-like" data-id="{{ resource.id }}">
+        <i class="fa fa-bookmark-o" aria-hidden="true"></i>
+      </div>
+    {% endif %}
+    <div class="caption">
+      <h5 class="group inner list-group-item-heading">
+      <a href="{{ url_for ('ResourceBP.resource_page', resource_id=resource.id) }}"><div class=ellipsis>{{ resource.name }}</div></a></h5>
+      <div class="row item-desc">
+        <div class="col-sm-6 item-price">
+          <p>S${{ resource.price }}</p>
+        </div>
+        <div class="col-sm-6 card-likes">
+          <p class="text-right">{{ resource.resource_rate.title() }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

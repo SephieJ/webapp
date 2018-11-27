@@ -1,0 +1,21 @@
+<div class="item col-lg-3 col-lg-3adj col-md-4 col-sm-6 col-xs-6">
+  <div class="thumbnail">
+    <a href="{{ url_for('ResourceBP.view_wishlist_page', slug=wishlist.reference) }}">
+      <div class="img-wrap">
+
+      <img style="height: 157px; width: 157px;" alt="" class="group list-group-image img-responsive lazy" data-src="{{ url_for('static', filename='assets/img/wishlist.png') }}" src="{{ url_for('static', filename='assets/img/giphy.gif') }}">
+      </div>
+    </a>
+    <div class="caption">
+      <h5 class="group inner list-group-item-heading">
+      <a href="{{ url_for('ResourceBP.view_wishlist_page', slug=wishlist.reference) }}" class="item-name"><div class="ellipsis">{{ wishlist.name }}</div></a></h5>
+      <div class="row item-desc">
+        <div class="col-xs-8 item-price">
+        </div>
+        <div class="col-xs-4 card-likes">
+          <p class="text-right"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

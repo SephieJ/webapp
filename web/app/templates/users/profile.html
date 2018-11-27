@@ -1,0 +1,174 @@
+{% extends "layouts/main.html" %}
+{% block head %}
+  <link href="{{ url_for('static', filename='assets/css/rateyo.css') }}" rel="stylesheet">
+  <style>
+    #user_div {
+        height: 500px;
+        overflow: auto;
+    }
+
+    #resource_div {
+        height: 500px;
+        overflow: auto;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  {# start main body #}
+  <div class="container" id="profile">
+    <div class="row">
+      {# start sidebar #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Profile</h4>
+          <ul class="list-unstyled">
+            <li><a class="active_category" href="{{ url_for ('UserBP.user_profile_page', user_id=current_user.id) }}">My Profile</a></li>
+            <li><a href="{{ url_for ('UserBP.user_edit_profile') }}">Edit Profile</a></li>
+            <li><a href="{{ url_for ('UserBP.user_change_password') }}">Change Password</a></li>
+          </ul>
+        </div>
+      </div> {# end sidebar #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        <div class="col-lg-12">
+          <h5 class="center-page-header">My Profile</h5>
+          <hr class="header-line">
+        </div>
+
+
+        <div class="row wrap-profile">
+          {# start profile info #}
+          <div class="col-lg-3">
+            <div class="profile-info" style="display: flex; flex-direction: column; align-items: center;">
+              <a href="">
+                  {% if user.image_url %}
+                    <img src="{{ user.image_url }}" alt="" class="img-rounded">
+                  {% else %}
+                    <img src="{{ url_for('static', filename='assets/img/avatar.png') }}" alt="" class="img-rounded">
+                  {% endif %}
+              </a>
+              <h5><b>{{ user.first_name }} {{ user.last_name }}</b></h5>
+              {% if session['is_company_admin'] %}
+                <span class="badge" style="font-size: 15px;">PIONEER</span>
+              {% endif %}
+              <a href="{{ url_for('CompanyBP.view_company_page', company_id=user.company.id) }}"><span>{{ user.company.name|safe }}</span></a>
+              <div class="text-muted">
+                Joined {{ user.created_date.strftime('%b %Y') }}
+              </div>
+              <div class="text-muted email">
+                {{ user.email }}
+              </div>
+              <!-- <h5 class="pull-left" style="margin-left: 30px;"><span class="rAverage"></span> <span class="pull-right sStartAve"></span></h5> -->
+              <h5><span class="rAverage"></span> <span class="pull-right sStartAve"></span></h5>
+            </div>
+          </div>
+
+          <div class="col-lg-9" style="margin-top: 20px; overflow-wrap: break-word;">
+            <div>
+              <h5><b>About Me</b></h5>
+              <p>{{ user.description|safe or '' }}</p>
+            </div>
+          </div>
+        </div>
+        {# end profile info #}
+
+        <div class="row">
+                <div style="border-top:1px solid #b5b5b5; margin:0px 30px">
+                  <div class="col-lg-6">
+                    <h5><b>Resources</b></h5>
+                    <div id="resource_div">
+                    {% for resource in resources %}
+                      <div class="col-sm-4">
+                        <a href="{{ url_for('ResourceBP.resource_page', slug=resource.reference) }}" class="item-name">
+                          <img style="width: 100px; height: 100px;" src="{{ resource.image_url }}" alt="..." class="img-thumbnail img-responsive">
+                        </a>
+                          <h5 class="ellipsis text-center"><b>{{ resource.name }}</b></h5>
+                          <h6 class="text-center text-danger">S${{ resource.price }}</h6>
+                      </div>
+                    {% endfor %}
+                    </div>
+                  </div>
+
+                  {# start rating #}
+                  <div class="col-lg-6" style="border-left:1px solid #b5b5b5;">
+                    <h5><b>Members' Feedback</b></h5>
+
+                    <div id="user_div" class="col-sm-12">
+                    {% for buyer in user.buyer_reviews %}
+                      <div class="media">
+                        <div class="media-left media-top">
+                          <img src="{{ url_for('static', filename='assets/img/avatar.png') }}" class="media-object" style="width:60px">
+                        </div>
+                        <div class="media-body">
+                          <h5 class="media-heading"><b><a href="{{ url_for('UserBP.view_profile_page', user_id=buyer.reviewer_id) }}">{{  buyer.reviewer }}</a></b>
+                          <div class="resource-rate pull-right" data-src ="{{ buyer.rate }}"></div>
+                          </h5>
+                          <p style="font-style :italic ">{{ '"' +buyer.message +'"' if buyer.message else '' }}</p>
+                        </div>
+                      </div>
+                    {% endfor %}
+
+                    <!-- {% for seller in user.seller_reviews %}
+                      <div class="media">
+                        <div class="media-left media-top">
+                          <img src="{{ url_for('static', filename='assets/img/avatar.png') }}" class="media-object" style="width:60px">
+                        </div>
+                        <div class="media-body">
+                          <h5 class="media-heading"><b><a href="{{ url_for('UserBP.view_profile_page', user_id=seller.reviewer_id) }}">{{  seller.reviewer }}</a></b>
+                          <div class="resource-rate pull-right" data-src ="{{ seller.rate }}"></div>
+                          </h5>
+                          <p style="font-style :italic ">{{ '"' +seller.message +'"' if seller.message else '' }}</p>
+                        </div>
+                      </div>
+                    {% endfor %} -->
+                    </div>
+                  </div>
+                  {# end rating #}
+
+                </div>
+              </div>
+
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock %}
+
+{% block lib_javascript %}
+  <script src="{{ url_for('static', filename='assets/js/rateyo.js') }}"></script>
+{% endblock %}
+
+{% block custom_javascript %}
+  <script>
+    $(function () {
+
+      setTimeout(function(){
+          var ratings = $('.resource-rate');
+          var rVal = 0;
+          for(var i = 0 ; i < ratings.length ; i++ ){
+
+            var src = ratings[i].getAttribute('data-src');
+              rVal += parseInt(src);
+            $(ratings[i]).rateYo({
+              rating: src,
+              readOnly: true,
+              starWidth: "20px",
+            });
+          }
+        console.log(ratings.length)
+        tRval = rVal / ratings.length;
+        // $('.rAverage').html(tRval +" out of 5 stars");
+        $('.sStartAve').rateYo({
+          rating: tRval,
+          readOnly: true,
+          starWidth: "20px",
+        });
+
+
+      },2000);
+
+    });
+  </script>
+{% endblock %}

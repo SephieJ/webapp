@@ -1,0 +1,262 @@
+{% extends "layouts/main.html" %}
+{% block head %}
+  <link href="{{ url_for('static', filename='assets/css/selectize.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='assets/css/selectize.default.css') }}" rel="stylesheet">
+{% endblock %}
+{% block body %}
+  {# start main body #}
+  <div class="container sub-banner" id="resource-profile">
+    <div class="row">
+      {# start sidebar category #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Category</h4>
+
+          <div class="form-group">
+            <select name="categories" id="categories" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);" multiple="multiple" data-placeholder="Search" style="width:100%;" tabindex="5">
+              {% for category in categories %}
+                <optgroup id="{{ category.name|safe }}">
+                    <option value="{{base_url}}/categories/{{ category.id }}">
+                      {{ category.name|safe }}
+                    </option>
+                </optgroup>
+              {% endfor %}
+            </select>
+            <div class="help-block with-errors"></div>
+          </div>
+
+          <input id="scrollup" type="image" width="170" height="20" name="scroll_up" src="{{ url_for('static', filename='assets/img/scrollup.png') }}">
+            <ul id="box" class="list-unstyled" style="height: 340px; overflow: hidden;">
+              {% for category in categories %}
+                <li class="ellipsis" id="{{ category.name|safe }}">
+                  <a id="category_name" href="{{ url_for ('CategoryBP.view_category_page', category_id=category.id) }}">
+                    {{ category.name|safe }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          <input id="scrolldown" type="image" width="170" height="20" name="scroll_down" src="{{ url_for('static', filename='assets/img/scrolldown.png') }}">
+
+          {% if current_user.is_authenticated %}
+          <br>
+          <h4>Wished Resources</h4>
+          <ul class="list-unstyled" style="height: 300px; overflow: auto;">
+            {% for wishlist in wishlists %}
+              <li>
+                <li><a href="{{ url_for('ResourceBP.view_wishlist_page', slug=wishlist.reference) }}">{{ wishlist.name|safe }}</a></li>
+              </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          {% endif %}
+        </div>
+      </div> {# end sidebar category #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        <div class="col-lg-12">
+          <h5 class="center-page-header pull-right"><a href="{{ url_for ('CompanyBP.about_us_page') }}">About Us</a></h5>
+          <h5 class="center-page-header">Contact Us</h5>
+          <hr class="header-line">
+        </div>
+
+        <div class="col-lg-6">
+        <br>
+        <p>We appreciate any feedback and would gladly answer any questions about the R2S portal as well as any press enquiries. Simply fill in the form below and we will get back to you as soon as possible!</p>
+        </div>
+        <div class="col-lg-6">
+          <div style="margin-top:20px;">
+            <h4>Send us a message</h4>
+            <h4 class="text-muted">
+              <small>
+                For other general enquiries, drop them in the form below or check out our <a href="{{ url_for('FaqBP.question_page', faq_id=12) }}">Frequently Asked Questions</a>. :)
+              </small>
+            </h4>
+
+            <div>
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-flash alert-{{ category }} alert-dismissible" role="alert" style="margin-top: 10px;">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <!-- <strong>Title</strong> --> {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+              {% endwith %}
+            </div>
+
+            <div class="contact-us-form">
+              <form id="contact_form" name="contact_form" role="form" action="{{ url_for('CompanyBP.contact_us_page') }}" method="POST">
+                {{ contact_form.csrf_token }}
+                {% if contact_form.name.errors %}
+                <div class="form-group has-error">
+                {% else %}
+                <div class="form-group">
+                {% endif %}
+                  <label for="name"><span class="text-red">*</span>Full Name</label>
+                  {{ contact_form.name(class="form-control", placeholder="Full Name", required="true") }}
+                  {% if contact_form.name.errors %}
+                    {% for error in contact_form.name.errors %}
+                      <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+
+                {% if contact_form.email.errors %}
+                <div class="form-group has-error">
+                {% else %}
+                <div class="form-group">
+                {% endif %}
+                  <label for="email"><span class="text-red">*</span>Email Address</label>
+                  {{ contact_form.email(class="form-control", placeholder="Email Address", required="true") }}
+                  {% if contact_form.email.errors %}
+                    {% for error in contact_form.email.errors %}
+                      <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+
+                {% if contact_form.message.errors %}
+                <div class="form-group has-error">
+                {% else %}
+                <div class="form-group">
+                {% endif %}
+                  <label for="message"><span class="text-red">*</span>Message</label>
+                  {{ contact_form.message(class="form-control", placeholder="Message", rows="6", required="true") }}
+                  {% if contact_form.message.errors %}
+                    {% for error in contact_form.message.errors %}
+                      <span class="help-block">{{ error }}</span>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+
+                <div aria-describedby="submit-tooltip" class="form-group">
+                  <button class="btn btn-primary btn-block" type="submit"><span>Send Message</span></button>
+                </div>
+
+              </form>
+            </div>
+
+          </div>
+        </div>
+
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock%}
+
+{% block lib_javascript %}
+  <script src="{{ url_for('static', filename='assets/js/selectize.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/selectize_no_result_plugin.js') }}"></script>
+{% endblock %}
+
+{% block custom_javascript %}
+
+<!-- Others must be on Last -->
+<script type="text/javascript">
+  $(document).ready(function(){
+
+    $("#categories > optgroup").filter(function(){
+      return this.id == "Others";
+    }).insertAfter("#categories > optgroup:last");
+
+    $("#box > li").filter(function(){
+      return this.id == "Others";
+    }).insertAfter($("#box > li:last"));
+
+  });
+</script>
+
+{# Form Validation #}
+<script>
+    $("#contact_form").validate({
+      rules: {
+        name: "required",
+        email: {
+          required: true,
+          email: true
+        },
+        message: "required"
+      },
+      messages: {
+        name: "Full Name is required.",
+        email: {
+          required: "Email Address is required.",
+        },
+        message: "Message is required.",
+      },
+      errorElement: "span",
+      errorPlacement: function(error, element) {
+        // Add the `help-block` class to the error element
+        error.addClass("help-block has-error");
+        if (element.prop("type") === "checkbox") {
+          error.insertAfter(element.parent("label"));
+        } else {
+          error.insertAfter(element);
+        }
+      },
+      highlight: function(element, errorClass, validClass ) {
+        $(element).parents(".form-group").addClass("has-error").removeClass("has-success");
+      },
+      unhighlight: function(element, errorClass, validClass) {
+        $(element).parents(".form-group").removeClass("has-error");
+      }
+    });
+  </script>
+
+  {# Search Categories #}
+  <script type="text/javascript">
+    // document.ready
+    $( document ).ready(function() {
+      $("#parent_category").hide();
+      $("#parent_category_label").hide();
+      $("#subcategory").hide();
+      $("#subcategory_label").hide();
+      initCategorySel();
+    });
+
+    // show image picker
+    $('#imgclick').click(function() {
+      $('#imgupload').trigger('click');
+    });
+
+    // init category selectize
+    function initCategorySel() {
+      $('#categories').selectize({
+        plugins: ['remove_button', 'restore_on_backspace', 'no_results'],
+        maxItems: 1,
+        onChange: function(value) {
+          if(value !== null) {
+            $("#categories-error").hide();
+          } else {
+            $("#categories-error").show();
+          }
+        }
+      });
+    }
+
+  </script>
+
+  {# Scroll bar Categories#}
+  <script type="text/javascript">
+    $(document).ready(function () {
+        $('#scrolldown').click(function () {
+            $('#box').animate({
+                scrollTop: '+=50'
+            }, 500);
+        });
+
+    });
+
+    $(document).ready(function () {
+        $('#scrollup').click(function () {
+            $('#box').animate({
+                scrollTop: '-=50'
+            }, 500);
+        });
+    });
+  </script>
+{% endblock %}

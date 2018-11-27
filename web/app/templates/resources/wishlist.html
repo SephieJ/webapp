@@ -1,0 +1,580 @@
+{% extends "layouts/main.html" %}
+{% block head %}
+  <link href="{{ url_for('static', filename='assets/css/cropper.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='assets/css/selectize.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='assets/css/selectize.default.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+  {# start main body #}
+  <div class="container" id="profile">
+    <div class="row">
+      {# start sidebar #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Categories</h4>
+
+          <div class="form-group">
+            <select name="categories_search" id="categories_search" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);" multiple="multiple" data-placeholder="Search" style="width:100%;" tabindex="5">
+              {% for category in categories %}
+                <optgroup id="{{ category.name|safe }}">
+                  <option value="{{base_url}}/categories/{{ category.id }}">
+                    {{ category.name|safe }}
+                  </option>
+                </optgroup>
+              {% endfor %}
+            </select>
+            <div class="help-block with-errors"></div>
+          </div>
+
+          <input id="scrollup" type="image" width="170" height="20" name="scroll_up" src="{{ url_for('static', filename='assets/img/scrollup.png') }}">
+            <ul id="box" class="list-unstyled" style="height: 340px; overflow: hidden;">
+              {% for category in categories %}
+                <li class="ellipsis" id="{{ category.name|safe }}">
+                  <a id="category_name" href="{{ url_for ('CategoryBP.view_category_page', category_id=category.id) }}">
+                    {{ category.name|safe }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          <input id="scrolldown" type="image" width="170" height="20" name="scroll_down" src="{{ url_for('static', filename='assets/img/scrolldown.png') }}">
+
+          <br>
+          <h4>Wished Resources</h4>
+          <ul class="list-unstyled" style="height: 300px; overflow: auto;">
+            {% for wishlist in wishlists %}
+              <li>
+                <li><a href="{{ url_for('ResourceBP.view_wishlist_page', slug=wishlist.reference) }}">{{ wishlist.name|safe }}</a></li>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div> {# end sidebar #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        {# start title #}
+        <div class="col-lg-12">
+          <h5 class="center-page-header">Add Wishlist</h5>
+          <hr class="header-line">
+        </div> {# end title #}
+
+
+        <div class="container-new-resources">
+          <div class="col-lg-6 col-md-6 col-sm-6">
+            <div class="new-resources">
+              {% with messages = get_flashed_messages(with_categories=true) %}
+                <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-flash alert-{{ category }} alert-dismissible" role="alert" style="margin-top: 10px;">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <!-- <strong>Title</strong> --> {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+              {% endwith %}
+              <div class="">
+                <form id="wishlist_form" name="wishlist_form" role="form" method="POST" action="{{ url_for('ResourceBP.add_wishlist_page') }}" files=true enctype="multipart/form-data">
+                  {{ wishlist_form.csrf_token }}
+
+                  <div class="form-group">
+                    <span>
+                      <p style="font-weight: bold; text-align: justify;">Unable to find a resource you need? Suggest by entering a description of the item(s) you need so that other users can add the item (Eg. measurements, model number, brand, quantity required etc.)
+                      Items needed may also be featured in our newsletter.
+                      </p>
+                    </span>
+                  </div>
+
+
+                  {# Category #}
+                  <div class="form-group">
+                    <label for="Category" id="category_label"><span class="text-red">*</span>Category</label>
+                    <select name="categories" id="categories" multiple="multiple" data-placeholder="Choose categories" style="width:100%;" tabindex="5">
+                      <option value=""></option>
+                      {% for category in categories %}
+                        <optgroup id="{{ category.name|safe }}" value="{{ category.id }}" label="{{ category.name|safe }}">
+                          {% for subcategory in category.subcategories %}
+                            <option value="{{ subcategory.id }}">{{ subcategory.name|safe }}</option>
+                          {% endfor %}
+                        </optgroup>
+                      {% endfor %}
+                    </select>
+                    <div class="help-block with-errors"></div>
+                  </div>
+
+                  {# Suggest Category Checkbox #}
+                  <div class="checkbox">
+                    <label>
+                      {{ wishlist_form.suggest_checkbox(value='n') }} <small class="text-muted">{{ wishlist_form.suggest_checkbox.label.text }}</small>
+                    </label>
+                    <small><em> (Suggested categories are subjected to approval.)</em></small>
+                  </div>
+
+                  {# Parent Category #}
+                  <div class="form-group">
+                    <label for="parent_category" id="parent_category_label">Main Category
+                      <i class="fa fa-question-circle tooltip-icon" aria-hidden="true">
+                        <span class="tooltiptext">
+                          <ul class="nav">
+                            <li>Choose an existing main category or suggest a new category.</li>
+                          </ul>
+                        </span>
+                      </i>
+                    </label>
+                    {{ wishlist_form.parent_category(placeholder="Choose an existing main category or suggest a new one") }}
+                  </div>
+
+                  {# Subcategory #}
+                  <div class="form-group">
+                    <label for="subcategory" id="subcategory_label">Sub-Category</label>
+                    {{ wishlist_form.subcategory(placeholder="Input sub-categories") }}
+                  </div>
+
+                  {# Item name #}
+                  {% if wishlist_form.name.errors %}
+                  <div class="form-group input-display-has-error has-error">
+                  {% else %}
+                  <div class="form-group">
+                  {% endif %}
+                    <label for="name"><span class="text-red">*</span>What is the name of your resource?</label>
+                    {{ wishlist_form.name(class="form-control", placeholder="Item name") }}
+                    <div class="help-block with-errors"></div>
+                    {% if wishlist_form.name.errors %}
+                      {% for error in wishlist_form.name.errors %}
+                          <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+
+                  {# Description #}
+                  {% if wishlist_form.description.errors %}
+                  <div class="form-group input-display-has-error has-error">
+                  {% else %}
+                  <div class="form-group">
+                  {% endif %}
+                    <label for="Description"><span class="text-red">*</span>Description</label>
+                    {{ wishlist_form.description(class="form-control", placeholder="Tell us more about your item. e.g. size, condition, colour etc...", rows="5") }}
+                    <div class="help-block with-errors"></div>
+                    {% if wishlist_form.description.errors %}
+                      {% for error in wishlist_form.description.errors %}
+                          <span class="help-block">{{ error }}</span>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+
+                  <p><em>This submission will be subject to the review of the site administrator. We will advise of the results within 48 hours.
+                  </em></p>
+
+                  <div class="form-group" aria-describedby="submit-tooltip">
+                    <button type="submit" id="addResource" class="btn btn-primary btn-default">
+                      <span>Submit</span>
+                    </button>
+                  </div>
+
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock %}
+
+{% block lib_javascript %}
+  <script src="{{ url_for('static', filename='assets/js/selectize.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/cropper.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/cropper-main.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/jquery.validate.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/additional-methods.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/selectize_no_result_plugin.js') }}"></script>
+{% endblock %}
+
+{% block custom_javascript %}
+<!-- Others must be on Last -->
+
+<script type="text/javascript">
+  $(document).ready(function(){
+
+    $("#categories_search > optgroup").filter(function(){
+      return this.id == "Others";
+    }).insertAfter("#categories_search > optgroup:last");
+
+    $("#categories > optgroup").filter(function(){
+      return this.id == "Others";
+    }).insertAfter("#categories > optgroup:last");
+
+    $("#box > li").filter(function(){
+      return this.id == "Others";
+    }).insertAfter($("#box > li:last"));
+
+  });
+</script>
+  <script type="text/javascript">
+    console.log("This is from cropper JS: " + window.upload_img_ctr);
+    $("#addResource").click(function(event) {
+      console.log("Current Upload Ctr: " + window.upload_img_ctr);
+      if (window.upload_img_ctr > 0){
+        event.preventDefault();
+      }
+      else {
+        var images = $('.inputImage_url').val()
+        if (images.length == 0) {
+          alert("Please upload a cover photo.");
+          event.preventDefault();
+        } else {
+          $("#addResource").submit();
+        }
+      }
+    });
+
+    // document.ready
+    $( document ).ready(function() {
+      $("#parent_category").hide();
+      $("#parent_category_label").hide();
+      $("#subcategory").hide();
+      $("#subcategory_label").hide();
+      initCategorySel();
+    });
+
+    // show image picker
+    $('#imgclick').click(function() {
+      $('#imgupload').trigger('click');
+    });
+
+    // show/hide suggest category
+    $('#suggest_checkbox').change(function() {
+      if (this.checked) {
+        // hide categories
+        $('#categories')[0].selectize.clear();
+        $('#categories')[0].selectize.destroy();
+        $('#category_label').hide();
+        $('#categories').hide();
+        $("#categories-error").hide();
+
+        // show parent categories
+        initParentCategorySel();
+        initSubcategorySel();
+        $('#parent_category_label').show();
+        $('#subcategory_label').show();
+
+        //$('#parent_category')[0].selectize.setValue($('#parent_category')[0].selectize.search('Others').items[0].id)
+        $('#parent_category')[0].selectize.setValue("");
+      } else {
+        // show category
+        $('#category_label').show();
+        $("#categories-error").show();
+        initCategorySel();
+
+        // hide parent categories
+        $('#parent_category')[0].selectize.clear();
+        $('#parent_category')[0].selectize.destroy();
+        $('#parent_category_label').hide();
+        $('#parent_category').hide();
+
+        // hide subcategories
+        $('#subcategory')[0].selectize.clear();
+        $('#subcategory')[0].selectize.destroy();
+        $('#subcategory_label').hide();
+        $('#subcategory').hide();
+      }
+    });
+
+    // init category selectize
+    function initCategorySel() {
+      $('#categories').selectize({
+        maxItems: 1,
+        searchField: ['optgroup', 'text'],
+        plugins: ['remove_button', 'restore_on_backspace', 'no_results'],
+        filter : function() {
+          alert("D");
+        },
+        onChange: function(value) {
+          if(value !== null) {
+            $("#categories-error").hide();
+          } else {
+            $("#categories-error").show();
+          }
+        },
+        lockOptgroupOrder: true,
+        onDropdownOpen: function() {
+          this.$dropdown_content[0].scrollTop = 0;
+        }
+
+      });
+    }
+
+    // init parent category selectize
+    function initParentCategorySel() {
+      $('#parent_category').selectize({
+        persist: true,
+        maxItems: 1,
+        create: function(input) {
+          return {
+              value: input,
+              text: input
+          }
+        },
+        onChange: function(value) {
+          if(value !== null) {
+            $("#parent_category-error").hide();
+          } else {
+            $("#parent_category-error").show();
+          }
+        }
+      });
+
+      // populate parent category
+      var categories = JSON.parse('{{ categories|tojson }}');
+      var other;
+      console.log(categories);
+      for (var category in categories) {
+        //$('#parent_category')[0].selectize.addOption({
+          //value: categories[category].id,
+          //text: categories[category].name
+        //});
+        category_name = categories[category].name.replace(/&amp;/g, '&');
+        if (categories[category].name !== "Others") {
+          $('#parent_category')[0].selectize.addOption({
+            value: categories[category].id,
+            text: category_name
+          });
+        } else {
+          other = {value: categories[category].id,
+                  text: categories[category].name}
+        }
+      }
+      $('#parent_category')[0].selectize.addOption(other);
+    }
+
+    // init subcategory selectize
+    function initSubcategorySel() {
+      $('#subcategory').selectize({
+        plugins: ['remove_button', 'restore_on_backspace'],
+        maxItems: 1,
+        persist: false,
+        create: function(input) {
+          return {
+              value: input,
+              text: input
+          }
+        },
+        onChange: function(value) {
+          console.log(value);
+          if(value !== "") {
+            $("#subcategory-error").hide();
+          } else {
+            $("#subcategory-error").show();
+          }
+        }
+      });
+    }
+  </script>
+
+  <script>
+    $("#resource_form").validate({
+      rules: {
+        categories: "required",
+        parent_category: "required",
+        subcategory: "required",
+        name: "required",
+        description: "required",
+        quantity: {
+          required: true,
+          digits: true
+        },
+        price: {
+          required: true,
+          number: true
+        },
+        zipcode: {
+          required: false,
+          digits: true,
+          minlength: 6,
+          maxlength: 6
+        }
+      },
+      messages: {
+        categories: "Category is required.",
+        parent_category: "Main category is required.",
+        subcategory: "Sub-category is required.",
+        name: "Resource name is required.",
+        description: "Description is required.",
+        quantity: {
+          required: "Quantity is required.",
+        },
+        price: {
+          required: "Price is required.",
+        },
+      },
+      ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input',
+      errorElement: "span",
+      errorPlacement: function(error, element) {
+        // Add the `help-block` class to the error element
+        error.addClass("help-block has-error");
+        if (element.prop("type") === "checkbox") {
+          error.insertAfter(element.parent("label"));
+        } else {
+          error.insertAfter(element);
+        }
+      },
+      highlight: function(element, errorClass, validClass ) {
+        $(element).parents(".form-group").addClass("has-error").removeClass("has-success");
+      },
+      unhighlight: function(element, errorClass, validClass) {
+        $(element).parents(".form-group").removeClass("has-error");
+      },
+      focusInvalid: false,
+      invalidHandler: function(event, validator) {
+        if(validator.errorList[0].element.id == 'categories' || validator.errorList[0].element.id == 'parent_category' || validator.errorList[0].element.id == 'subcategory') {
+          $('html, body').animate({
+            scrollTop: $(".new-resources").offset().top
+          }, 0);
+        } else {
+          validator.errorList[0].element.focus();
+        }
+      }
+    });
+  </script>
+
+  <script>
+    $(function(){
+      var profileImageURL;
+      var url_image = window.URL || window.webkitURL;
+      var image_container = document.getElementById('profilepic');
+
+      $(document).on('change', '#imgupload', function(){
+        var import_image = this;
+        import_image_profile(import_image);
+
+      });
+
+      function import_image_profile(source) {
+
+          var file_types = ['png','jpg','jpeg'];
+          var file_type_ctr = 0;
+
+          var files = source.files;
+          var file;
+          if (files && files.length) {
+            file = files[0];
+
+            for(var type in file_types){
+                if(file_types[type] === file.type.replace("image/","")){
+                    file_type_ctr += 1;
+                }
+            }
+
+            if(file_type_ctr == 0){
+                window.alert('Invalid file format');
+                return;
+            }
+          }
+
+
+      }
+
+    });
+  </script>
+
+  <script>
+    function checkLength(len,ele){
+      var fieldLength = ele.value.length;
+      if(fieldLength <= len){
+        return true;
+      }
+      else
+      {
+        var str = ele.value;
+        str = str.substring(0, str.length - 1);
+        ele.value = str;
+      }
+    }
+  </script>
+
+  {# Search Categories #}
+  <script type="text/javascript">
+    // document.ready
+    $( document ).ready(function() {
+      $("#parent_category").hide();
+      $("#parent_category_label").hide();
+      $("#subcategory").hide();
+      $("#subcategory_label").hide();
+      initCategorySel();
+    });
+
+    // show image picker
+    $('#imgclick').click(function() {
+      $('#imgupload').trigger('click');
+    });
+
+    // init category selectize
+    // function initCategorySel() {
+    //   $('#categories').selectize({
+    //     plugins: ['remove_button', 'restore_on_backspace', 'no_results'],
+    //     onChange: function(value) {
+    //       if(value !== null) {
+    //         $("#categories-error").hide();
+    //       } else {
+    //         $("#categories-error").show();
+    //       }
+    //     }
+    //   });
+    // }
+
+  </script>
+
+  {# Search Categories #}
+  <script type="text/javascript">
+    // document.ready
+    $( document ).ready(function() {
+      $("#parent_category").hide();
+      $("#parent_category_label").hide();
+      $("#subcategory").hide();
+      $("#subcategory_label").hide();
+      initCategorySelect();
+    });
+
+    // init category selectize
+    function initCategorySelect() {
+      $('#categories_search').selectize({
+        plugins: ['remove_button', 'restore_on_backspace', 'no_results'],
+        maxItems: 1,
+        onChange: function(value) {
+          if(value !== null) {
+            $("#categories-error").hide();
+          } else {
+            $("#categories-error").show();
+          }
+        }
+      });
+    }
+
+  </script>
+
+  {# Scroll bar Categories#}
+  <script type="text/javascript">
+    $(document).ready(function () {
+        $('#scrolldown').click(function () {
+            $('#box').animate({
+                scrollTop: '+=50'
+            }, 500);
+        });
+
+    });
+
+    $(document).ready(function () {
+        $('#scrollup').click(function () {
+            $('#box').animate({
+                scrollTop: '-=50'
+            }, 500);
+        });
+    });
+  </script>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "layouts/main.html" %}
+{% block body %}
+  {# start main body #}
+  <div class="container sub-banner" id="transactions">
+    <div class="row">
+      {# start sidebar #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Support Tickets</h4>
+          {# <p><i>Pending</i></p> #}
+          <ul class="list-unstyled">
+            <li><a href="{{ url_for('UserSupportBP.support_page') }}">Create</a></li>
+            <li><a class="active_category" href="#">Pending</a></li>
+            <li><a href="{{ url_for('UserSupportBP.completed_support_page') }}">Completed</a></li>
+          </ul>
+        </div>
+      </div> {# end sidebar #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        {# start breadcrumbs #}
+        <div class="col-lg-12">
+          <div class="row">
+            <div class="col-sm-4">
+              <h5 class="center-page-header">Pending</h5>
+            </div>
+          </div>
+          <hr class="header-line">
+        </div> {# end breadcrumbs #}
+
+        <div class="col-lg-12">
+          <ol class="breadcrumb">
+            <li><a href="{{ url_for('UserBP.home_page') }}">Home</a></li>
+            <li>Support Tickets</li>
+            <li class="active">Pending</li>
+          </ol>
+        </div>
+
+        {% if tickets|length == 0 %}
+
+        <div class="blank-page">
+          <div class="empty-box text-center">
+            <p style="font-weight: bold; font-size: 30px; margin-top: 250px;"><span>You don't have any messages at the moment.</span></p>
+          </div>
+        </div>
+
+        {% else %}
+
+        {# start message list #}
+        <div class="col-lg-12">
+          {% for ticket in tickets %}
+            {% if ticket.status == 'PENDING' %}
+            <div class="transaction-row">
+              <a href="{{ url_for('UserSupportBP.message_support_page', support_id=ticket.id) }}" class="inherit-link">
+                <div class="row">
+                  <div class="col-sm-12 col-xs-6 transaction-profile">
+                    <div class="media">
+                      <div class="media-body">
+                        <div class="text-small">
+                          {{ ticket.created_date.strftime('%d %B, %Y %H:%M') }}
+                          <div class="text-bold ellipsis">{{ ticket.subject or 'No Subject' }}</div>
+                        </div>
+                        <div class="text-small">
+                          <span class="text-muted">{{ ticket.message|safe }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+            {% else %}
+              <!-- <div class="blank-page">
+                <div class="empty-box text-center">
+                  <p style="font-weight: bold; font-size: 30px; margin-top: 250px;"><span>You don't have any messages at the moment.</span></p>
+                </div>
+              </div> -->
+            {% endif %}
+          {% endfor %}
+        </div> {# end message list #}
+        {% endif %}
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock %}

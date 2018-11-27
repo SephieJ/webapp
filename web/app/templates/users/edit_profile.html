@@ -1,0 +1,357 @@
+{% extends "layouts/main.html" %}
+{% block head %}
+  <link href="{{ url_for('static', filename='assets/css/rateyo.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+  {# start main body #}
+  <div class="container" id="profile">
+    <div class="row">
+      {# start sidebar #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Profile</h4>
+          <ul class="list-unstyled">
+            <li><a href="{{ url_for ('UserBP.user_profile_page', user_id=user.id) }}">My Profile</a></li>
+            <li><a class="active_category" href="{{ url_for ('UserBP.user_edit_profile') }}">Edit Profile</a></li>
+            <li><a href="{{ url_for ('UserBP.user_change_password') }}">Change Password</a></li>
+          </ul>
+        </div>
+      </div> {# end sidebar #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+            <div class="col-lg-12">
+              {% if 'PIONEER' in user.roles %}
+              <h5 class="center-page-header pull-right"><a href="{{ url_for ('UserBP.user_company_page', company_id=user.company.id) }}">Company Details</a></h5>
+              <h5 class="center-page-header">Edit Profile</h5>
+              <hr class="header-line">
+              {% else %}
+              <h5 class="center-page-header pull-right"><a href="{{ url_for ('UserBP.user_company_view', company_id=user.company.id) }}">Company Details</a></h5>
+              <h5 class="center-page-header">Edit Profile</h5>
+              <hr class="header-line">
+              {% endif %}
+            </div>
+
+            <div class="wrap-profile">
+            <form role="form" action="{{ url_for('UserBP.user_edit_profile') }}" method="POST" files=true enctype="multipart/form-data" name="edit_profile" id="edit_profile">
+            {{ user_form.csrf_token }}
+              <div class="col-lg-3">
+                <div class="profile-info">
+                  <a href="#" id="imgclick">
+                    <div class="profile-avatar">
+                      <label class="settings-profile-avatar" >
+                        {% if current_user.image_url %}
+                          <img id="profilepic" src="{{ current_user.image_url }}" alt="" class="center-block img-rounded">
+                        {% else %}
+                          <img id="profilepic" src="{{ url_for('static', filename='assets/img/avatar.png') }}" alt="" class="center-block img-rounded">
+                        {% endif %}
+                        <div class="profile-avatar-link">
+                            <i class="fa fa-camera" aria-hidden="true"></i>
+                        </div>
+                      </label>
+                    </div>
+                  </a>
+                  {{ user_form.image_url(id="imgupload", class="form-control", style="display:none;") }}
+                  <div class="text-center small"><em>maximum of 2MB.</em></div>
+                  <div class="text-center small"><em>Available formats (.JPG, .JPEG, .PNG)</em></div>
+
+                  <h4>{{ current_user.first_name }} {{ current_user.last_name }}</h4>
+                  {% if session['is_company_admin'] %}
+                    <span class="badge" style="font-size: 15px;">PIONEER</span>
+                  {% endif %}
+                  <p>{{ current_user.co_name|safe }}</p>
+                  <div class="text-muted">
+                    Joined {{ current_user.created_date.strftime('%b %Y') }}
+                  </div>
+                  <div class="text-muted email" style="overflow-wrap: break-word;">
+                    {{ current_user.email }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-9" style="margin-top: 20px;">
+                  <div class="col-md-12">
+                      <h5><b>User Profile</b></h5>
+
+                      <div class="form-group">
+                        <span>Bio / Description</span>
+                          {% if current_user.description %}
+                            <input onblur="textCounter(this.form.recipients,this,250);" disabled  onfocus="this.blur();" tabindex="999" maxlength="3" size="5" value="{{250 - user.description|count}}/250" name="counter" style="background-color: white; outline: none;">
+                            {{ user_form.description(class="form-control", placeholder="Tell us something about yourself", rows="7", cols="30", maxlength="250", type="text", size="250", onblur="textCounter(this,this.form.counter,250);", onkeyup="textCounter(this,this.form.counter,250);") }}
+
+                          {% else %}
+                            <input onblur="textCounter(this.form.recipients,this,250);" disabled  onfocus="this.blur();" tabindex="999" maxlength="3" size="5" value="250/250" name="counter" style="background-color: white;">
+                            {{ user_form.description(class="form-control", placeholder="Tell us something about yourself", rows="7", cols="30", maxlength="250", type="text", size="250", onblur="textCounter(this,this.form.counter,250);", onkeyup="textCounter(this,this.form.counter,250);") }}
+                          {% endif %}
+
+                          <div class="help-block with-errors"></div>
+                            {% if user_form.description.errors %}
+                                {% for error in user_form.description.errors %}
+                                    <span class="help-block">{{ error }}</span>
+                                {% endfor %}
+                            {% endif %}
+                      </div>
+
+                      <div>
+                        {% with messages = get_flashed_messages(category_filter=['profile']) %}
+                        <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+                        {% if messages %}
+                          {% for message in messages %}
+                              {% set msg = message.split(';') %}
+                              <div class="alert alert-flash alert-{{ msg[1] }} alert-dismissible" role="alert" style="margin-top: 10px;">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <!-- <strong>Title</strong> --> {{ msg[0] }}
+                            </div>
+                          {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+                      </div>
+
+                      <div class="row">
+                        <div class="col-sm-6">
+                          <h5><b>Profile</b></h5>
+
+                          <div class="form-group">
+                            <span>First Name</span>
+                            {{ user_form.first_name(class="form-control", value=current_user.first_name) }}
+                            <div class="help-block with-errors"></div>
+                              {% if user_form.first_name.errors %}
+                                  {% for error in user_form.first_name.errors %}
+                                      <span class="help-block">{{ error }}</span>
+                                  {% endfor %}
+                              {% endif %}
+                          </div>
+
+                          <div class="form-group">
+                            <span>Last Name</span>
+                            {{ user_form.last_name(class="form-control", value=current_user.last_name) }}
+                            <div class="help-block with-errors"></div>
+                              {% if user_form.last_name.errors %}
+                                  {% for error in user_form.last_name.errors %}
+                                      <span class="help-block">{{ error }}</span>
+                                  {% endfor %}
+                              {% endif %}
+                          </div>
+
+                          <div class="form-group">
+                            <span>Company Name</span>
+                          <input type="text" name="company_name" class="form-control" value="{{current_user.co_name|safe}}"readonly="true">
+                          </div>
+
+                          <div class="form-group">
+                            <span>Designation</span>
+                            {{ user_form.designation(class="form-control", value=user.designation) }}
+                            <div class="help-block with-errors"></div>
+                              {% if user_form.designation.errors %}
+                                  {% for error in user_form.designation.errors %}
+                                      <span class="help-block">{{ error }}</span>
+                                  {% endfor %}
+                              {% endif %}
+                          </div>
+
+                        </div>
+
+                        <div class="col-sm-5 col-sm-offset-1">
+                          <h5><b>Account</b></h5>
+
+                          <div class="form-group">
+                            <span>Mobile Number</span>
+                            {% if user.mobile_number %}
+                              {{ user_form.mobile_number(class="form-control", value=current_user.mobile_number, maxlength="8", type="number", size="8") }}
+                            {% else %}
+                              {{ user_form.mobile_number(class="form-control", placeholder="Mobile Number", maxlength="8", type="number", size="8") }}
+                            {% endif %}
+                            <div class="help-block with-errors"></div>
+                              {% if user_form.mobile_number.errors %}
+                                  {% for error in user_form.mobile_number.errors %}
+                                      <span class="help-block">{{ error }}</span>
+                                  {% endfor %}
+                              {% endif %}
+                          </div>
+
+                          <div class="form-group">
+                            <span>Direct Line</span>
+                            {% if user.landline_number %}
+                              {{ user_form.landline_number(class="form-control", value=current_user.landline_number, maxlength="8", type="number", size="8") }}
+                            {% else %}
+                              {{ user_form.landline_number(class="form-control", placeholder="Office Number", maxlength="8", type="number", size="8") }}
+                            {% endif %}
+                            <div class="help-block with-errors"></div>
+                              {% if user_form.landline_number.errors %}
+                                  {% for error in user_form.landline_number.errors %}
+                                      <span class="help-block">{{ error }}</span>
+                                  {% endfor %}
+                              {% endif %}
+                          </div>
+
+                          <div class="checkbox">
+                            <label>
+                              {{ user_form.subscribe_email(value='n') }} <span>{{ user_form.subscribe_email.label.text }}</span>
+                            </label>
+                          </div>
+
+                          <div class="checkbox">
+                            <label>
+                              {{ user_form.subscribe_newsletter(value='n') }} <span>{{ user_form.subscribe_newsletter.label.text }}</span>
+                            </label>
+                          </div>
+
+                          <div class="form-group" aria-describedby="submit-tooltip">
+                            <button class="btn btn-primary pull-right" type="submit">Save</button>
+                          </div>
+
+                        </div>
+                      </div>
+
+
+                  </div>
+
+              </div>
+              </form>
+            </div>
+          </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock %}
+
+{% block lib_javascript %}
+  <script src="{{ url_for('static', filename='assets/js/daterangepicker.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/jquery.validate.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/additional-methods.js') }}"></script>
+{% endblock %}
+
+{% block custom_javascript %}
+  <script>
+    $(function() {
+      $('input[name="birth_date"]').daterangepicker({
+        singleDatePicker: true,
+        autoUpdateInput: false,
+        showDropdowns: true,
+        locale: {
+        "format": "DD-MM-YYYY",
+        }
+      }, function(chosen_date) {
+        $('input[name="birth_date"]').val(chosen_date.format('DD-MM-YYYY'));
+      });
+    });
+  </script>
+
+  <script type="text/javascript">
+    $('#imgclick').click(function() {
+      $('#imgupload').trigger('click');
+    });
+
+    function textCounter(field, countfield, maxlimit) {
+     if ( field.value.length > maxlimit ) {
+      field.value = field.value.substring( 0, maxlimit );
+      field.blur();
+      field.focus();
+      return false;
+     } else {
+      countfield.value = maxlimit - field.value.length + '/250';
+     }
+    }
+  </script>
+
+  <script>
+    $(function(){
+      var profileImageURL;
+      var url_image = window.URL || window.webkitURL;
+      var image_container = document.getElementById('profilepic');
+
+      $(document).on('change', '#imgupload', function(){
+        var import_image = this;
+        import_image_profile(import_image);
+
+      });
+
+      function import_image_profile(source) {
+
+          var file_types = ['png','jpg','jpeg'];
+          var file_type_ctr = 0;
+
+          var files = source.files;
+          var file;
+          if (files && files.length) {
+            file = files[0];
+
+            for(var type in file_types){
+                if(file_types[type] === file.type.replace("image/","")){
+                    file_type_ctr += 1;
+                }
+            }
+
+            if(file_type_ctr == 0){
+                window.alert('Invalid file format');
+                return;
+            }
+
+            if (/^image\/\w+/.test(file.type)) {
+
+              var size = files[0].size;
+              var max_size = 2000000;
+              if (size > max_size) {
+                window.alert("Maximum file size exceeds");
+                source.value = null;
+                return;
+              } else {
+                image_container.src = profileImageURL = url_image.createObjectURL(file);
+              }
+
+
+            } else {
+              window.alert('Please choose an image file.');
+            }
+          }
+
+
+      }
+
+    });
+  </script>
+
+  <script>
+
+    $("#edit_profile").validate({
+      rules: {
+        first_name: "required",
+        last_name: "required",
+        email: "required",
+        office_number: {
+          phoneSG: true
+        },
+        mobile_number: {
+          mobileSG: true
+        },
+        birth_date: {
+          birth_Date: true,
+        }
+      },
+      messages: {
+        first_name: "First Name is required.",
+        last_name: "Last Name is required.",
+        email: "Email Address is required."
+      },
+      errorElement: "span",
+      errorPlacement: function(error, element) {
+        // Add the `help-block` class to the error element
+        error.addClass("help-block has-error");
+        if (element.prop("type") === "checkbox") {
+          error.insertAfter(element.parent("label"));
+        } else {
+          error.insertAfter(element);
+        }
+      },
+      highlight: function(element, errorClass, validClass ) {
+        $(element).parents(".form-group").addClass("has-error").removeClass("has-success");
+      },
+      unhighlight: function(element, errorClass, validClass) {
+        $(element).parents(".form-group").removeClass("has-error");
+      }
+    });
+
+
+  </script>
+{% endblock %}

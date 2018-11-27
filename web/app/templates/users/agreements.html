@@ -1,0 +1,223 @@
+{% extends "layouts/main.html" %}
+{% block body %}
+<style type="text/css">
+  a.inactive {
+    border:0;
+    background:0;
+ }
+  table td {
+      background: none !important;
+  }
+  /* span {
+      background: none !important;
+  } */
+</style>
+  <div id="divLoading">
+  </div>
+  <div class="container sub-banner" id="transactions">
+    <div class="row">
+      {# start sidebar #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Transactions</h4>
+          <p><i>Lease Agreement</i></p>
+          <ul class="list-unstyled">
+            <li>
+              {% if transaction_type == 'selling' %}
+                <a class="active_category" href="{{  url_for ('UserTransactionBP.view_selling_transactions_page') }}">Resources to Share</a>
+              {% else %}
+                <a href="{{  url_for ('UserTransactionBP.view_selling_transactions_page') }}">Resources to Share</a>
+              {% endif %}
+            </li>
+            <li>
+              {% if transaction_type == 'buying' %}
+                <a class="active_category" href="{{  url_for ('UserTransactionBP.view_buying_transactions_page') }}">Resources Needed</a>
+              {% else %}
+                <a href="{{  url_for ('UserTransactionBP.view_buying_transactions_page') }}">Resources Needed</a>
+              {% endif %}
+            </li>
+          </ul>
+        </div>
+      </div> {# end sidebar #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        {# start title #}
+        <div class="col-lg-12">
+          <div class="row">
+            <div class="col-sm-4">
+              <h5 class="center-page-header">
+                {% if transaction_type == 'buying' %}
+                  Resources Needed
+                {% else %}
+                  Resources to Share
+                {% endif %}
+              </h5>
+            </div>
+
+            <div id="sidebar" class="col-sm-8 transactions-type">
+              <ul class="nav navbar-nav pull-right">
+                <li>
+                  {% if transaction_type == 'buying' %}
+                    <a href="{{  url_for ('UserTransactionBP.view_buying_transactions_page', status='active') }}">On-going Transactions</a>
+                  {% else %}
+                    <a href="{{  url_for ('UserTransactionBP.view_selling_transactions_page', status='active') }}">On-going Transactions</a>
+                  {% endif %}
+                </li>
+                <li>
+                  {% if transaction_type == 'buying' %}
+                    <a href="{{  url_for ('UserTransactionBP.view_buying_transactions_page', status='completed') }}">Completed Transactions</a>
+                  {% else %}
+                    <a href="{{  url_for ('UserTransactionBP.view_selling_transactions_page', status='completed') }}">Completed Transactions</a>
+                  {% endif %}
+                </li>
+              </ul>
+            </div>
+
+          </div>
+          <hr class="header-line">
+        </div> {# end title #}
+
+        {# start breadcrumbs #}
+        <div class="col-lg-12">
+          <ol class="breadcrumb">
+            <li><a href="/">Home</a></li>
+            <li class="active">Agreement</li>
+          </ol>
+        </div> {# end breadcrumbs #}
+
+
+
+        {# start transaction list #}
+        <div class="col-lg-12">
+          <br>
+          <div class="form-group">
+            <div class="col-sm-12">
+              {% if transaction_type == 'selling' %}
+                <label class="control-label label-agreement"><i class="fa"></i>Please use the terms as discussed with the other party. You can access this form through the transaction page later if you need to discuss the terms first.</label>
+              {% else %}
+                <label class="control-label label-agreement"><i class="fa"></i>Please check through the agreement form carefully. Once the agreement is accepted, it will be fixed and non-editable</label>
+              {% endif %}
+            </div>
+          </div>
+              <p>&nbsp;</p>
+          <div class="form-group">
+            {{  transaction_form.csrf_token }}
+
+            <div class="col-sm-12">
+              {% if transaction_type == 'selling' %}
+              <input type="hidden" name="booking_reference_code" value="{{ transaction_data.reference_code }}">
+              <input type="hidden" name="agreement_id" value="">
+              <textarea id="agreement_html" name="agreement_html" rows="20" class="form-control" type="text" style="display:none;"></textarea>
+              <div name="selling-agreement">
+
+              </div>
+              {% else %}
+                <input type="hidden" name="booking_reference_code" value="{{ buying_transaction.reference_code }}">
+                <div name="buying-agreement">
+
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          <p>&nbsp;</p>
+          <div class="col-sm-12">
+
+            {% if transaction_type == 'selling' %}
+              <button name="EditAgreement" type="button" class="btn btn-default">Edit Agreement</button>
+              <button name="SendAgreement" type="button" edit_confirm="true" style="display:none;" class="btn btn-primary">Send Agreement</button>
+            {% else %}
+              <button name="BuyerAcceptance" type="button" class="btn btn-primary">Accept Agreement</button>
+              {{transactio_data}}
+              <a href="{{  url_for('UserBP.message_thread', message_id=transaction_data.chatroom_id) }}" name="No" type="button" class="btn btn-primary" target="_blank" data-dismiss="modal">Feedback</a>
+            {% endif %}
+          </div>
+            <p>&nbsp;</p>
+            {% if transaction_type == 'selling' %}
+            <div class="form-group label-agreement">
+              <div class="col-sm-12">
+                  <!--<label class="control-label label-agreement"><i class="fa"></i> Please ensure the terms are accurate.Once the agreement is sent, the other party will have the option to provide feeback.If accepted, the agreement will be fixed and non editable. If there is feedback, you will be notified of the message</label>-->
+                  <label class="control-label label-agreement"><!--<i class="fa"></i>-->Please ensure the terms are accurate. Once the agreement is sent, the other party will have the option to provide feedback. If accepted, the agreement will be fixed and non editable. If there is feedback, it will be done through the chat message.</label>
+              </div>
+            </div>
+            {% endif %}
+          <p>&nbsp;</p>
+        </div> {# end transaction list #}
+
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div>
+  <!--Modal Agreements Confirm-->
+  <div name="BuyingAgreements" style="z-index:1051" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <form class="modal-content" onsubmit="return false">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+          <h4 class="modal-title">Confirm acceptance</h4>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+              <div class="col-lg-12" >
+                <p>Once the agreement is accepted, it will be fixed and non editable</p>
+              </div>
+          </div>
+        </div>
+        <div class="modal-footer customdlft">
+          <button name="Cancel" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button name="Confirm" type="button" class="btn btn-primary">Confirm</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!--Modal Agreements Send Confirmation-->
+  <div name="ConfirmSendAgreement" style="z-index:1051" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+      <form class="modal-content" onsubmit="return false">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+          <h4 class="modal-title">Confirmation</h4>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+              <div class="col-lg-12" >
+                <p>Are you sure you want to send the agreement?</p>
+              </div>
+          </div>
+        </div>
+        <div class="modal-footer customdlft">
+          <button name="Cancel" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button onclick="AgreementSelling.aWidgets.AgreementSelling.save()" type="button" class="btn btn-primary">Yes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block custom_javascript %}
+  <script src="{{  url_for('static', filename='plugins/tinymce/tinymce.min.js') }}"></script>
+    <script>
+      $("div#divLoading").addClass('show');
+    </script>
+    {% if transaction_type == 'selling' %}
+      <script src="{{  url_for('static', filename='assets/js/custom/modules/AgreementSelling.js') }}"></script>
+      <script>
+         //transaction_data
+        window.transaction_id = {{ transaction_id}};
+        //window.reference_code = "{{ transaction_data.reference_code }}";
+        AgreementSelling.init(function(){
+          cCb && cCb();
+        });
+      </script>
+    {% else %}
+      <script src="{{  url_for('static', filename='assets/js/custom/modules/AgreementBuying.js') }}"></script>
+      <script>
+        window.reference_code = "{{buying_transaction.reference_code}}";
+        AgreementBuying.init(function(){
+          cCb && cCb();
+        });
+      </script>
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,209 @@
+
+{% extends "layouts/main.html" %}
+{% block head %}
+  <link href="{{ url_for('static', filename='assets/css/swiper.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='assets/css/selectize.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='assets/css/selectize.default.css') }}" rel="stylesheet">
+  <script>
+     var local_url = window.location.toString();
+     if(local_url.indexOf("resourcestoshare.com") != -1)
+     {
+   //window.location = 'https://resourcestoshare.com/prelaunch';
+
+     }
+  </script>
+{% endblock %}
+
+{% block body %}
+  {# start page header #}
+  <div class="container-fluid no-padding">
+    <div class="row">
+      <div class="col-lg-12 banner">
+        <div class="swiper-container">
+          <div class="swiper-wrapper">
+          {% if current_user.is_authenticated %}
+            <div class="swiper-slide"><a href="{{ url_for ('CategoryBP.view_category_page', category_id=5) }}"><img src="{{ url_for('static', filename='assets/img/R2S-Portal-Banner-2.jpg') }}" alt="" class="img-responsive"></a></div>
+            <div class="swiper-slide"><a href="{{ url_for ('CategoryBP.view_category_page', category_id=7) }}"><img src="{{ url_for('static', filename='assets/img/R2S-Portal-Banner-3_Collaborate.jpg') }}" alt="" class="img-responsive"></a></div>
+            <div class="swiper-slide"><a href="{{ url_for ('CategoryBP.view_category_page', category_id=3) }}"><img src="{{ url_for('static', filename='assets/img/R2S-Portal-Banner-4_Space.jpg') }}" alt="" class="img-responsive"></a></div>
+            <div class="swiper-slide"><a href="{{ url_for('CompanyBP.about_us_page') }}"><img src="{{ url_for('static', filename='assets/img/R2S-Portal-Banner-5_Resources.jpg') }}" alt="" class="img-responsive"></a></div>
+          {% else %}
+            <div class="swiper-slide"><a href="{{ url_for('UserBP.register_page') }}"><img src="{{ url_for('static', filename='assets/img/R2S-Portal-Banner-2.jpg') }}" alt="" class="img-responsive"></a></div>
+            <div class="swiper-slide"><a href="{{ url_for ('CategoryBP.view_category_page', category_id=7) }}"><img src="{{ url_for('static', filename='assets/img/R2S-Portal-Banner-3_Collaborate.jpg') }}" alt="" class="img-responsive"></a></div>
+            <div class="swiper-slide"><a href="{{ url_for ('CategoryBP.view_category_page', category_id=3) }}"><img src="{{ url_for('static', filename='assets/img/R2S-Portal-Banner-4_Space.jpg') }}" alt="" class="img-responsive"></a></div>
+            <div class="swiper-slide"><a href="{{ url_for('CompanyBP.about_us_page') }}"><img src="{{ url_for('static', filename='assets/img/R2S-Portal-Banner-5_Resources.jpg') }}" alt="" class="img-responsive"></a></div>
+          {% endif %}
+          </div>
+
+          <!-- Add Pagination -->
+          <div class="swiper-pagination"></div>
+          <!-- Add Arrows -->
+          <!-- <div class="swiper-button-next swiper-button-white"></div>
+          <div class="swiper-button-prev swiper-button-white"></div> -->
+
+        </div>
+
+      </div>
+    </div>
+  </div> {# end page header #}
+
+  {# start main body #}
+  <div class="container" id="content">
+    <div class="row">
+
+      {# start center page #}
+      <div class="py-5 bg-light text-dark">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-7">
+              <p><b>Resources to Share, R2S, is a B2B digital platform which offers businesses a simple yet powerful way to optimise and maximise their underutilised resources through collaboration with each other.</b></p>
+              <h3 class="mb-4">Get Started!</h3>
+              <div class="row text-center">
+                <div style="margin-left: 15px;">
+                  <iframe src="//www.slideshare.net/slideshow/embed_code/key/1jPXYKGSjRTf1R" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; width: 150%;" allowfullscreen>
+                  </iframe>
+
+                  <div style="margin-bottom:5px; width: 150%;"> <strong> <a href="//www.slideshare.net/ResourcesToShare/resources-2-share-easy-guide-92633190" title="Resources 2 Share - Easy Guide" target="_blank">Resources To Share - Easy Guide</a> </strong> from <strong><a href="//www.slideshare.net/ResourcesToShare" target="_blank">Resources To Share</a></strong>
+                  <br>
+                      <a href="{{ url_for('static', filename='uploads/files/Easy_Guide.pdf') }}" target="_blank" download="R2S - Easy Guide.pdf">
+                        <button style="padding-top: 10px; padding-bottom: 10px;" type="button" class="btn btn-danger btn-default">
+                          <span style="font-size: 16px; color: #FFFFFF; font-weight: bold;"><i style="font-size: 24px" class="fa fa-file-pdf-o"></i> Download PDF</span>
+                        </button>
+                      </a>
+                  </div>
+                </div>
+                <br>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock %}
+
+{% block lib_javascript %}
+  <script src="{{ url_for('static', filename='assets/js/swiper.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/selectize.min.js') }}"></script>
+  <!-- <script src="{{ url_for('static', filename='assets/js/cropper.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/cropper-main.js') }}"></script> -->
+  <script src="{{ url_for('static', filename='assets/js/jquery.validate.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/additional-methods.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/selectize_no_result_plugin.js') }}"></script>
+{% endblock %}
+
+{% block custom_javascript %}
+  {# Init Swiper #}
+  <script>
+    var swiper = new Swiper('.swiper-container', {
+        pagination: '.swiper-pagination',
+        // nextButton: '.swiper-button-next',
+        // prevButton: '.swiper-button-prev',
+        slidesPerView: 1,
+        paginationClickable: true,
+        spaceBetween: 30,
+        autoplay: 7000,
+        autoplayDisableOnInteraction: false,
+        centeredSlides: true,
+        loop: true,
+        effect: 'fade'
+
+    });
+  </script>
+
+  {# Favorite icon #}
+  <script>
+    $(function(){
+      $('.thumbnail').on('mouseover', function(){
+          $(this).find('.rs-card-like').css('display','block');
+      });
+      $('.thumbnail').on('mouseleave', function(){
+          $(this).find('.rs-card-like').css('display','none');
+      });
+    });
+  </script>
+
+  {# Ajax call to mark favorites #}
+  <script>
+    $(document).ready(function() {
+      var favorites_url = '{{ base_url }}' + "/favorites";
+
+      $(".bookmark-border").click(function() {
+        var resource_id = $(this).data('id');
+        var fave_url = '/resources/' + resource_id + '/favorites';
+        var dis = $(this);
+        $.ajax({
+          url: fave_url,
+          datatype: 'json',
+          type: 'GET',
+          success: function(data) {
+            if (data["message"] == "Successfully updated") {
+              $('#bookmark-fill-' + resource_id).removeClass("rs-card-like");
+              $('#bookmark-fill-' + resource_id).addClass("user-rs-card-like");
+              dis.parent().find("i.fa-bookmark").css("color", "#f97106");
+              console.log("Added");
+
+            } else if (data["message"] == "Successfully removed") {
+              $('#bookmark-fill-' + resource_id).removeClass("user-rs-card-like");
+              $('#bookmark-fill-' + resource_id).addClass("rs-card-like");
+              dis.parent().find("i.fa-bookmark").css("color", "rgba(0, 0, 0, 0.2)");
+              console.log("Removed");
+
+            }
+          },
+          error: function(error) {
+              console.log(error);
+          }
+        });
+      });
+    });
+  </script>
+
+  <!-- Others must be on Last -->
+  <script type="text/javascript">
+    $(document).ready(function(){
+
+      $("#categories > optgroup").filter(function(){
+        return this.id == "Others";
+      }).insertAfter("#categories > optgroup:last");
+
+      $("#box > li").filter(function(){
+        return this.id == "Others";
+      }).insertAfter($("#box > li:last"));
+
+    });
+  </script>
+
+
+  {# Search Categories #}
+  <script type="text/javascript">
+    // document.ready
+    $( document ).ready(function() {
+      $("#parent_category").hide();
+      $("#parent_category_label").hide();
+      $("#subcategory").hide();
+      $("#subcategory_label").hide();
+      initCategorySel();
+    });
+
+    // init category selectize
+    function initCategorySel() {
+        $('#categories').selectize({
+          plugins: ['remove_button', 'restore_on_backspace', 'no_results'],
+          maxItems: 1,
+          onChange: function(value) {
+            if(value !== null) {
+              $("#categories-error").hide();
+            } else {
+              $("#categories-error").show();
+            }
+          }
+        });
+      }
+
+  </script>
+
+{% endblock %}
+

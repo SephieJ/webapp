@@ -1,0 +1,128 @@
+{% extends "layouts/main.html" %}
+{% block head %}
+  <link href="{{ url_for('static', filename='assets/css/rateyo.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+  {# start main body #}
+  <div class="container" id="profile">
+    <div class="row">
+      {# start sidebar #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Profile</h4>
+          <ul class="list-unstyled">
+            <li><a class="active_category" href="{{ url_for ('UserBP.user_profile_page', user_id=current_user.id) }}">My Profile</a></li>
+            <li><a href="{{ url_for ('UserBP.user_edit_profile') }}">Edit Profile</a></li>
+            <li><a href="{{ url_for ('UserBP.user_change_password') }}">Change Password</a></li>
+          </ul>
+        </div>
+      </div> {# end sidebar #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        <div class="col-lg-12">
+          <h5 class="center-page-header">My Profile</h5>
+          <hr class="header-line">
+        </div>
+
+
+        <div class="row wrap-profile">
+          {# start profile info #}
+          <div class="col-lg-3">
+            <div class="profile-info">
+              <a href="">
+                  {% if user.image_url %}
+                    <img src="{{ user.image_url }}" alt="" class="img-rounded">
+                  {% else %}
+                    <img src="{{ url_for('static', filename='assets/img/avatar.png') }}" alt="" class="img-rounded">
+                  {% endif %}
+              </a>
+              <h5><b>{{ user.first_name }} {{ user.last_name }}</b></h5>
+              <span>{{ user.company.name }}</span>
+              <div class="text-muted">
+                Joined {{ user.created_date.strftime('%b %Y') }}
+              </div>
+              <div class="text-muted email">
+                {{ user.email }}
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-9">
+            <div>
+              <h5><b>About Me</b></h5>
+              <p>{{ user.description }} or {{ }}</p>
+            </div>
+          </div>
+        </div>
+        {# end center page #}
+
+          {# start rating #}
+          <div class="col-lg-9 col-md-8 col-sm-7">
+            <h5 class="center-page-header">Current Rating: <span class="rAverage"></span> <span class="pull-right sStartAve"></span></h5>
+            <hr>
+              {% for reviews in user.seller_reviews %}
+                <div class="profile-resource">
+                  <div class="row">
+                      <div class="col-sm-9"><strong>{{  reviews.reviewer }}</strong> </div>
+                      <div class="col-sm-3"><div class="resource-rate pull-right" data-src ="{{  reviews.rate }}"></div></div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <p><strong>Company</strong> : {{  reviews.company_name }}</p>
+                      <p><strong>Resource</strong> : {{  reviews.resource_name }}</p>
+                      <p style="font-style :italic ">{{ '"' +reviews.message +'"' if reviews.message else '' }} </p>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+              </div> {# end rating #}
+          </div> {# end rating #}
+        </div>
+
+
+
+
+
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock %}
+
+{% block lib_javascript %}
+  <script src="{{ url_for('static', filename='assets/js/rateyo.js') }}"></script>
+{% endblock %}
+
+{% block custom_javascript %}
+  <script>
+    $(function () {
+
+      setTimeout(function(){
+          var ratings = $('.resource-rate');
+          var rVal = 0;
+          for(var i = 0 ; i < ratings.length ; i++ ){
+
+            var src = ratings[i].getAttribute('data-src');
+              rVal += parseInt(src);
+            $(ratings[i]).rateYo({
+              rating: src,
+              readOnly: true,
+              starWidth: "20px",
+            });
+          }
+        tRval = rVal / ratings.length;
+        $('.rAverage').html(tRval +" out of 5 stars");
+        $('.sStartAve').rateYo({
+          rating: tRval,
+          readOnly: true,
+          starWidth: "20px",
+        });
+
+
+      },2000);
+
+    });
+  </script>
+{% endblock %}

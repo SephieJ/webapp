@@ -1,0 +1,258 @@
+{% extends "layouts/main.html" %}
+{% block head %}
+  <link href="{{ url_for('static', filename='assets/css/selectize.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='assets/css/selectize.default.css') }}" rel="stylesheet">
+{% endblock %}
+{% block body %}
+  {# start main body #}
+  <div class="container" id="bookmarks">
+    <div class="row">
+      {# start sidebar category #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Category</h4>
+
+          <div class="form-group">
+            <select name="categories" id="categories" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);" multiple="multiple" data-placeholder="Search" style="width:100%;" tabindex="5">
+              {% for category in categories %}
+                <optgroup>
+                    <option value="{{base_url}}/categories/{{ category.id }}">{{ category.name|safe }}</option>
+                </optgroup>
+              {% endfor %}
+            </select>
+            <div class="help-block with-errors"></div>
+          </div>
+
+          <input id="scrollup" type="image" width="170" height="20" name="scroll_up" src="{{ url_for('static', filename='assets/img/scrollup.png') }}">
+            <ul id="box" class="list-unstyled" style="height: 340px; overflow: hidden;">
+              {% for category in categories %}
+                {% if category.name != "Others" %}
+                <li class="ellipsis"><a id="category_name" href="{{ url_for ('CategoryBP.view_category_page', category_id=category.id) }}">{{ category.name|safe }}</a></li>
+                {% endif %}
+              {% endfor %}
+              <li class="ellipsis"><a id="category_name" href="/categories/13">Others</a></li>
+            </ul>
+          <input id="scrolldown" type="image" width="170" height="20" name="scroll_down" src="{{ url_for('static', filename='assets/img/scrolldown.png') }}">
+
+          <br>
+          <h4>Wished Resources</h4>
+          <ul class="list-unstyled" style="height: 300px; overflow: auto;">
+            {% for wishlist in wishlists %}
+              <li>
+                <li><a href="{{ url_for('ResourceBP.view_wishlist_page', slug=wishlist.reference) }}">{{ wishlist.name|safe }}</a></li>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div> {# end sidebar category #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        {# start selected category #}
+        <div class="col-lg-12">
+          <h5 class="center-page-header">Bookmarks</h5>
+          <hr class="header-line">
+          <br>
+        </div> {# end selected category #}
+
+
+        {% if favorites|length == 0 %}
+
+        <div class="blank-page">
+          <div class="empty-box text-center">
+            <p style="font-weight: bold; font-size: 30px; margin-top: 250px;"><span>You don't have any bookmark at the moment.</span></p>
+            <p style="margin-top: 30px; font-weight: bold;"><span>Don't wait! Start browsing now!</span></p>
+            <p class="btn-horizontal-list"><a class="btn btn-primary" href="{{ url_for('UserBP.home_page') }}"><span>Browse Resources</span></a></p>
+          </div>
+        </div>
+
+        {% else %}
+
+        {% for resource in favorites %}
+          {% include 'layouts/resource_item.html' %}
+        {% endfor %}
+        <div class="clearfix"></div>
+        <div class="row text-center">
+          <nav aria-label="Page navigation">
+            <ul class="pagination">
+              {% if pagination.has_prev %}
+                <li>
+                  <a href="{{ url_for('UserBP.view_bookmarks_page', page=page|int - 1) }}" aria-label="Next">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+              {% else %}
+                <li class="disabled">
+                  <span>
+                    <span aria-hidden="true">&laquo;</span>
+                  </span>
+                </li>
+              {% endif %}
+              {% for page in pagination.iter_pages() %}
+                {% if page == pagination.page %}
+                  <li class="active"><a href="{{ url_for('UserBP.view_bookmarks_page', page=page) }}">{{ page }}</a></li>
+                {% else %}
+                  <li><a href="{{ url_for('UserBP.view_bookmarks_page', page=page) }}">{{ page }}</a></li>
+                {% endif %}
+              {% endfor %}
+
+              {% if pagination.has_next %}
+                <li>
+                  <a href="{{ url_for('UserBP.view_bookmarks_page', page=page|int + 1) }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+              {% else %}
+                <li class="disabled">
+                  <span>
+                    <span aria-hidden="true">&raquo;</span>
+                  </span>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        </div>
+        {% endif%}
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock %}
+
+{% block lib_javascript %}
+  <script src="{{ url_for('static', filename='assets/js/selectize.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/selectize_no_result_plugin.js') }}"></script>
+{% endblock %}
+
+{% block custom_javascript %}
+  <script>
+    $(function(){
+      $('.user-rs-fav').on('mouseover', function(){
+          $(this).find('.fav-rs-card-like').css('display','block');
+      });
+      $('.user-rs-fav').on('mouseleave', function(){
+          $(this).find('.fav-rs-card-like').css('display','none');
+      });
+    });
+  </script>
+  <script>
+    $(document).ready(function() {
+      $(".fav-rs-card-like").click(function() {
+        var resource_id = $(this).data('id');
+        var fave_url = '/resources/' + resource_id + '/favorites';
+        $.ajax({
+          url: fave_url,
+          datatype: 'json',
+          type: 'GET',
+          success: function(data) {
+            if (data["message"] == "Successfully updated") {
+
+            } else if (data["message"] == "Successfully removed") {
+              $('#user-resource-' + resource_id).remove();
+            }
+          },
+          error: function(error) {
+              console.log(error);
+          }
+        });
+      });
+    });
+  </script>
+
+  {# Favorite icon #}
+  <script>
+    $(function(){
+      $('.thumbnail').on('mouseover', function(){
+          $(this).find('.rs-card-like').css('display','block');
+      });
+      $('.thumbnail').on('mouseleave', function(){
+          $(this).find('.rs-card-like').css('display','none');
+      });
+    });
+  </script>
+
+  {# Ajax call to mark favorites #}
+  <script>
+    $(document).ready(function() {
+      var favorites_url = '{{ base_url }}' + "/favorites";
+
+      $(".bookmark-border").click(function() {
+        var resource_id = $(this).data('id');
+        var fave_url = '/resources/' + resource_id + '/favorites';
+        var dis = $(this);
+        $.ajax({
+          url: fave_url,
+          datatype: 'json',
+          type: 'GET',
+          success: function(data) {
+            if (data["message"] == "Successfully updated") {
+              $('#bookmark-fill-' + resource_id).removeClass("rs-card-like");
+              $('#bookmark-fill-' + resource_id).addClass("user-rs-card-like");
+              dis.parent().find("i.fa-bookmark").css("color", "#f97106");
+              console.log("Added");
+
+            } else if (data["message"] == "Successfully removed") {
+              $('#bookmark-fill-' + resource_id).removeClass("user-rs-card-like");
+              $('#bookmark-fill-' + resource_id).addClass("rs-card-like");
+              dis.parent().find("i.fa-bookmark").css("color", "rgba(0, 0, 0, 0.2)");
+              console.log("Removed");
+
+            }
+          },
+          error: function(error) {
+              console.log(error);
+          }
+        });
+      });
+    });
+  </script>
+
+  {# Search Categories #}
+  <script type="text/javascript">
+    // document.ready
+    $( document ).ready(function() {
+      $("#parent_category").hide();
+      $("#parent_category_label").hide();
+      $("#subcategory").hide();
+      $("#subcategory_label").hide();
+      initCategorySel();
+    });
+
+    // init category selectize
+    function initCategorySel() {
+      $('#categories').selectize({
+        plugins: ['remove_button', 'restore_on_backspace', 'no_results'],
+        maxItems: 1,
+        onChange: function(value) {
+          if(value !== null) {
+            $("#categories-error").hide();
+          } else {
+            $("#categories-error").show();
+          }
+        }
+      });
+    }
+
+  </script>
+
+  {# Scroll bar Categories#}
+  <script type="text/javascript">
+    $(document).ready(function () {
+        $('#scrolldown').click(function () {
+            $('#box').animate({
+                scrollTop: '+=50'
+            }, 500);
+        });
+
+    });
+
+    $(document).ready(function () {
+        $('#scrollup').click(function () {
+            $('#box').animate({
+                scrollTop: '-=50'
+            }, 500);
+        });
+    });
+  </script>
+{% endblock %}
+

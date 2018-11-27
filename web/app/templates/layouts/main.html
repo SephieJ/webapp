@@ -1,0 +1,187 @@
+{% extends "layouts/base.html" %}
+{% block parent_layout %}
+  {# start navigation bar #}
+  <nav class="navbar navbar-default navbar-fixed-top">
+    {# start navbar container #}
+    <div class="container">
+      {# start navbar header #}
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-navbar-collapse-2">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="{{ url_for('UserBP.home_page') }}">
+          <img src="{{ url_for('static', filename='assets/img/logo_header.png') }}" alt="" class="img-responsive">
+        </a>
+      </div> {# end navbar header #}
+
+      {# navbar collapse #}
+      <div class="collapse navbar-collapse" id="bs-navbar-collapse-2">
+        <ul class="nav navbar-nav navbar-right header-nav">
+          <li>
+
+            <a class="{{ 'active_category' if sPage == 'about-us' else '' }} or {{ 'active_category' if sPage == 'contact-us' else '' }}" href="{{ url_for('CompanyBP.about_us_page') }}">About Us</a>
+          </li>
+          <li>
+            <a class="{{ 'active_category' if sPage == 'faqs' else '' }}" href="{{ url_for('FaqBP.question_page', faq_id=12) }}">FAQ</a>
+          </li>
+          <!-- <li>
+            <a href="{{ url_for('CompanyBP.contact_us_page') }}">Contact Us</a>
+          </li> -->
+          {% if current_user.is_authenticated %}
+            {# Display user nav dropdown #}
+            <li>
+              <a class="{{ 'active_category' if sPage == 'wishlists' else '' }}" href="{{ url_for('ResourceBP.add_wishlist_page') }}">Wishlist</a>
+            </li>
+            <li>
+              <a class="{{ 'active_category' if sPage == 'share' else '' }}" href="{{ url_for('ResourceBP.add_resources_page') }}">Add Resource</a>
+            </li>
+            <li>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                <i class="fa fa-user-circle fa-lg" aria-hidden="true"></i> {{ current_user.first_name }} {{ current_user.last_name }}<i class="fa fa-caret-down fa-lg" aria-hidden="true"></i>
+              </a>
+              <ul class="dropdown-menu">
+                <li class="ellipsis">
+                  <a>
+                  {% if current_user.co_name %}
+                    {{ current_user.co_name|safe }}
+                  {% else %}
+                    {{ 'No Company' }}
+                  {% endif %}
+
+                  </a>
+                </li>
+                <li>
+                  <a href="{{ url_for ('UserBP.user_profile_page', user_id=current_user.id) }}">
+                    <i class="fa fa-user-circle" aria-hidden="true"></i> Profile {% if session['is_company_admin'] %}
+                        <span class="badge">PIONEER</span>
+                    {% endif %}</a>
+                </li>
+                <li>
+                  <a href="{{ url_for('UserBP.view_bookmarks_page') }}">
+                    <i class="fa fa-bookmark" aria-hidden="true"></i> Bookmarks <span class="badge"><!-- {{ user_favorites|length }} --></span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{{ url_for ('UserTransactionBP.view_selling_transactions_page') }}"><i class="fa fa-bars" aria-hidden="true"></i> Transactions
+                  <span class="badge">
+                  {% if transaction_count %}
+                    {{ transaction_count }}
+                  {% else %}
+                  0
+                  {% endif %}
+                  </span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{{ url_for ('UserBP.user_resources_page', user_id=current_user.id) }}"><i class="fa fa-cube" aria-hidden="true"></i> Resources</a>
+                </li>
+                <li>
+                  <a href="{{ url_for('UserBP.view_message_list') }}"><i class="fa fa-envelope" aria-hidden="true"></i> Messages
+                  <span class="badge">
+                  {% if message_count %}
+                    {{ message_count }}
+                  {% else %}
+                  0
+                  {% endif %}
+                  </span>
+                  </a>
+                </li>
+                <li>
+                  <a href="{{ url_for('UserSupportBP.support_ticket_page') }}"><i class="fa fa-life-ring" aria-hidden="true"></i> Support Tickets
+                    <span name="SupportBadge">
+                    <!-- {% if count_messages %}
+                      {{ count_messages }}
+                    {% else %}
+                    0
+                    {% endif %} -->
+                    </span>
+                  </a>
+                </li>
+                <li role="separator" class="divider"></li>
+                <li>
+                  <a href="{{ url_for('UserBP.logout') }}">Logout</a>
+                </li>
+              </ul>
+            </li>
+          {% else %}
+            {# Display login and register links #}
+            <li>
+              <a href="{{ url_for('UserBP.login_page', next='wishlist') }}">Wishlist</a>
+            </li>
+            <li>
+              <a class="{{ 'active_category' if sPage == 'login' else '' }}" href="{{ url_for('UserBP.login_page') }}">Login</a>
+            </li>
+            <li>
+              <a class="{{ 'active_category' if sPage == 'register' else '' }}" href="{{ url_for('UserBP.register_page') }}">Sign Up</a>
+            </li>
+          {% endif %}
+          <li>
+          {% if current_user.is_authenticated %}
+            <form class="navbar-form search-form" role="search" method="GET" action="{{ url_for('ResourceBP.search_all') }}">
+              <input type="text" name="query" class="form-control" placeholder="Search" aria-describedby="sizing-addon1">
+              <button type="submit" class="button-plain" type="button">
+                <i class="fa fa-search search-icon" aria-hidden="true"></i>
+              </button>
+            </form>
+          {% else %}
+            <form class="navbar-form search-form" role="search" method="GET" action="{{ url_for('ResourceBP.search') }}">
+              <input type="text" name="query" class="form-control" placeholder="Search" aria-describedby="sizing-addon1">
+              <button type="submit" class="button-plain" type="button">
+                <i class="fa fa-search search-icon" aria-hidden="true"></i>
+              </button>
+            </form>
+          {% endif %}
+          </li>
+        </ul>
+      </div> {# end navbar collapse #}
+    </div> {# start navbar container #}
+  </nav> {# end navigation #}
+
+  {# start body content #}
+  {% block body %}{% endblock %}
+  {# end body content #}
+
+  {# footer #}
+  <footer>
+    <div class="copyright">
+      <div class="container text-center">
+        <span><a href="{{ url_for('CompanyBP.policies_page') }}" style="color: #91a4a9;">Privacy Policy</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;</span>
+        <span><a href="{{ url_for('CompanyBP.policies_page') }}" style="color: #91a4a9;">Terms of Use</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;</span>
+        <span><a href="{{ url_for('CompanyBP.about_us_page') }}" style="color: #91a4a9;">About Us</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;</span>
+        <span><a href="{{ url_for('FaqBP.question_page', faq_id=12) }}" style="color: #91a4a9;">FAQ</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;</span>
+        <span><a href="{{ url_for('CompanyBP.contact_us_page') }}" style="color: #91a4a9;">Contact Us</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;</span>
+        <span><a href="{{ url_for('FaqBP.getting_started_page') }}" style="color: #91a4a9;">User Guide</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;</span>
+        <span><a href="{{ url_for('CompanyBP.contest_page') }}" style="color: #91a4a9;">Contest</a>&nbsp;&nbsp;&nbsp;</span>
+        <!-- <span><a href="#" style="color: #91a4a9;">News</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;</span>
+        <span><a href="#" style="color: #91a4a9;">Documentation Templates</a></span> -->
+      </div>
+      <br>
+      <div class="container text-center">
+        <span>Copyright © 2018 Resources to Share. All Rights Reserved.</span>
+      </div>
+    </div>
+  </footer> {# end footer #}
+{% endblock %}
+
+{% block custom_javascript %}
+
+  <script>
+    // var url = window.location;
+
+    // $('ul.nav a[href="'+ url +'"]').parent().addClass('active_category');
+
+    // $('ul.nav a').filter(function() {
+    //     return this.href == url;
+    // // }).parent().addClass('active_category');
+    // $(document).ready(function(){
+    //   $('ul li a').click(function(){
+    //     $('li a').removeClass("active_category");
+    //     $(this).addClass("active_category");
+    //   });
+    // });
+  </script>
+
+{% endblock %}

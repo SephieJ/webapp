@@ -1,0 +1,156 @@
+{% extends "layouts/main.html" %}
+{% block head %}
+  <link href="{{ url_for('static', filename='assets/css/rateyo.css') }}" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.css"/>
+{% endblock %}
+
+{% block body %}
+  {# start main body #}
+  <div class="container" id="profile">
+    <div class="row">
+      {# start sidebar #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Resources</h4>
+          <ul class="list-unstyled">
+            <li><a class="tab" href="{{ url_for('UserBP.user_resources_page', user_id=current_user.id) }}">My Resources</a></li>
+            <li><a class="tab" href="{{ url_for('ResourceBP.add_resources_page') }}">Add Resources</a></li>
+            <li><a class="tab" href="{{ url_for ('UserBP.archive_resources_page', user_id=current_user.id) }}">Archived Resources</a></li>
+          </ul>
+
+          <br>
+
+          <h4>Wishlist</h4>
+          <ul class="list-unstyled">
+            <li><a class="tab active_category" href="#">My Wishlist</a></li>
+            <li><a class="tab" href="{{ url_for('ResourceBP.add_wishlist_page') }}">Add Wishlist</a></li>
+            <li><a class="tab" href="{{ url_for('UserBP.archive_wishlist_page', user_id=current_user.id) }}">Archived Wishlist</a></li>
+          </ul>
+        </div>
+      </div> {# end sidebar #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        {# start title #}
+        <div class="col-lg-12">
+          <h5 class="center-page-header">My Wishlist</h5>
+          <hr class="header-line">
+           <br>
+        </div> {# end title #}
+
+        {% if wishlists|length == 0 %}
+
+        <div class="blank-page">
+          <div class="empty-box text-left">
+            <p style="font-weight: bold; font-size: 15px; margin-top: 100px; margin-left: 15px;"><span>You don't have any wishlist at the moment.</span></p>
+            <p style="font-size: 25px; margin-top: 10px; font-weight: bold; margin-left: 15px;"><span><i>Start browsing now!</i></span></p>
+            <p style="margin-left: 15px;" class="btn-horizontal-list"><a class="btn btn-primary" href="{{ url_for('UserBP.home_page') }}"><span>Browse Resources</span></a></p>
+          </div>
+        </div>
+
+        {% else %}
+        <div class="col-lg-12">
+          <table id="wishlistTable" class="display" style="width:100%">
+            <thead>
+                <tr>
+                  <th>Reference Code</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Date Created</th>
+                  <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+              {% for wishlist in wishlists %}
+                <tr>
+                    <td>{{ wishlist.referenceCode }}</td>
+                    <td><a class="ellipsis" href="{{ url_for('ResourceBP.view_wishlist_page', slug=wishlist.reference) }}">{{ wishlist.name }}</a></td>
+                    <td style="text-overflow: ellipsis; max-width: 200px; overflow: hidden; white-space: nowrap;">{{ wishlist.description }}</td>
+                    <td>{{ wishlist.created_date.strftime('%d-%m-%Y') }}</td>
+                    <td>
+                      <a class="btn btn-warning btn-sm" href="{{ url_for('ResourceBP.edit_wishlist_page', slug=wishlist.reference) }}"><i class="fa fa-pencil" aria-hidden="true"></i> </a>
+                      <button id="archive_button" class="btn btn-danger btn-sm" data-id="{{ wishlist.reference }}" type="submit"><i class="fa fa-trash-o" aria-hidden="true"></i> </button>
+                    </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="clearfix"></div>
+
+        {% endif %}
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+
+  <!--Modal confirm-->
+  <div name="Archive" style="z-index:1051" class="modal fade DataTableModal" role="dialog">
+    <div class="modal-dialog">
+      <form method="POST" role="form" files=true enctype="multipart/form-data" class="modal-content">
+      {{ wishlist_form.csrf_token }}
+        <div class="modal-header">
+        <!-- <input type="hidden" name="user_id"> -->
+          <button type="button" class="close" data-dismiss="modal"><i class="fa fa-times-circle"></i></button>
+          <h4 class="modal-title">Confirmation</h4>
+        </div>
+        <div class="modal-body">
+          <!--Are you sure do you want to delete this Item?-->
+          Are you sure you want to delete this wishlist?
+        </div>
+        <div class="modal-footer customdlft">
+          <button name="Cancel" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button name="Confirm" type="submit" class="btn btn-primary">Yes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+{% endblock %}
+
+{% block lib_javascript %}
+  <script src="{{ url_for('static', filename='assets/js/rateyo.js') }}"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.js"></script>
+{% endblock %}
+
+{% block custom_javascript %}
+  <script>
+    $(function () {
+
+      $("#profile-rate").rateYo({
+        rating: 5,
+        readOnly: true,
+      });
+
+      $(".resource-rate").rateYo({
+        rating: 4,
+        readOnly: true,
+        starWidth: "20px",
+      });
+
+    });
+
+  $(".tab").click(function() {
+    $(this).parent().addClass('active_category').siblings().removeClass('active_category');
+
+    });
+  </script>
+
+  {# Delete Confirmation #}
+  <script>
+   $(document).on("click", "#archive_button", function () {
+     var myWishlistId = $(this).data('id');
+     var userID = {{ current_user.id }}
+     // alert(myBookId);
+     $("div[name='Archive']").modal('show');
+     $('button[name="Confirm"]').attr("formaction", "/users/"+userID+"/wishlist/"+myWishlistId+"/archive");
+    });
+  </script>
+
+  <script>
+    $(document).ready( function () {
+        $('#wishlistTable').DataTable();
+    } );
+  </script>
+{% endblock %}

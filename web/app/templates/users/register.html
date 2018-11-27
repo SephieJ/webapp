@@ -1,0 +1,445 @@
+{% extends "layouts/main.html" %}
+{% block body %}
+  {# start main body #}
+  <div class="container sub-banner" id="resource-profile">
+    <div class="row">
+      {# start sidebar category #}
+      <div class="col-lg-2 col-md-2 hidden-xs">
+        <div class="sidebar-module">
+          <h4>Category</h4>
+            <input id="scrollup" type="image" width="170" height="20" name="scroll_up" src="{{ url_for('static', filename='assets/img/scrollup.png') }}">
+              <ul id="box" class="list-unstyled" style="height: 340px; overflow: hidden;">
+                {% for category in categories %}
+                  <li class="ellipsis" id="{{ category.name|safe }}">
+                    <a id="category_name" href="{{ url_for ('CategoryBP.view_category_page', category_id=category.id) }}">
+                      {{ category.name|safe }}
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            <input id="scrolldown" type="image" width="170" height="20" name="scroll_down" src="{{ url_for('static', filename='assets/img/scrolldown.png') }}">
+        </div>
+      </div> {# end sidebar category #}
+
+      {# start center page #}
+      <div class="col-lg-10 col-md-10 center-page">
+        <div class="col-lg-12">
+          <h5 class="center-page-header">Sign Up</h5>
+          <hr class="header-line">
+        </div>
+
+        <div class="col-sm-6 hidden-xs join-form-description">
+          <h3 class="join-form-header"><span><b>Success Through Collaboration</b></span></h3>
+          <p class="join-form-description"><span>In the past, success was built upon competition. The future, however, requires something even more: collaboration. And through R2S,
+          that vision of mutually beneficial partnerships is now a reality.</span></p>
+          <h3 class="join-form-header"><span><b>Why join?</b></span></h3>
+
+          <div id="" class="col-md-2">
+            <img src="{{ url_for('static', filename='assets/img/1R2.png') }}" class="w-100">
+            <br>
+            <br>
+            <img src="{{ url_for('static', filename='assets/img/1R.png') }}" class="w-100">
+            <br>
+            <br>
+            <!-- <i style="color: #F65959; font-size: 5em; margin-left: 10px;" class="fa fa-check-circle"></i> -->
+            <img src="{{ url_for('static', filename='assets/img/1R3.png') }}" class="w-100">
+          </div>
+
+          <p style="padding-left: 140px; padding-top: 8px;"><b style="font-size: 14px;">Maximise Resources</b>
+          <br> Turn underutilised resources
+          <br> into new revenue stream.
+          </p>
+
+          <p style="padding-left: 140px; padding-top: 30px;"><b style="font-size: 14px;">Discover New Partnerships</b>
+          <br> Connect and collaborate with
+          <br> other companies.
+          </p>
+
+          <p style="padding-left: 140px; padding-top: 20px;"><b style="font-size: 14px;">Minimise Risk and Cost</b>
+          <br> Determine the suitability of
+          <br> a resource before
+          <br> investing.
+          </p>
+
+          <br>
+          <a href="{{ url_for('CompanyBP.contest_page') }}"><img src="{{ url_for('static', filename='assets/img/signup-banner.jpg') }}" class="img-responsive" alt="">
+          </a>
+        </div>
+
+        <div class="col-xs-12 col-sm-6 join-form-main">
+          <div>
+            <h3 class="join-form-header"><span><b>Get Started Now</b></span></h3>
+            <p class="join-form-description"><span>Sign up for your free account to get access to more content, chat with businesses and list your own underutilised resources.</span></p>
+          </div>
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-flash alert-{{ category }} alert-dismissible" role="alert" style="margin-top: 10px;">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <!-- <strong>Title</strong> --> {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+          {% endwith %}
+          <form method="POST" role="form" name="register_form" id="register_form">
+            {{ register_form.csrf_token }}
+
+            {# Company Name #}
+            {% if register_form.company_name.errors %}
+            <div class="form-group has-error">
+            {% else %}
+            <div class="form-group">
+            {% endif %}
+              <label for="company_name"><span class="text-red">*</span>Company Name</label>
+              {{ register_form.company_name(class="form-control", placeholder="Enter your company name") }}
+              {% if register_form.company_name.errors %}
+                {% for error in register_form.company_name.errors %}
+                  <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            {# Business reg number #}
+            {% if register_form.business_reg_number.errors %}
+            <div class="form-group has-error">
+            {% else %}
+            <div class="form-group">
+            {% endif %}
+              <label for="business_reg_number"><span class="text-red">*</span>Business Registration No.
+                <i class="fa fa-question-circle tooltip-icon-reg" aria-hidden="true">
+                  <span class="tooltiptext">
+                    <ul class="nav">
+                      <li>UEN-LOCAL CO (e.g. 200312345A)</li>
+                      <li>UEN-OTHERS (e.g. T08FC1234A)</li>
+                      <li>UEN-BUSINESS (e.g. 52912345A)</li>
+                      <li>ASGD (e.g. A2500123J)</li>
+                      <li>ITR (e.g. 2001123456X)</li>
+                      <li>GSTN (e.g. M91234567X)</li>
+                    </ul>
+                    <div style="padding-top: 10px;">
+                      <p>
+                        To Find Out your UEN number,
+                        please check your ACRA or do a
+                        <a target="_blank" href="https://www.uen.gov.sg" style="color: #fff; text-decoration: underline;">
+                          search here
+                        </a>
+                      </p>
+                    </div>
+                  </span>
+                </i>
+              </label>
+
+              {{ register_form.business_reg_number(class="form-control", placeholder="Enter your Business Registration No.", maxlength=11) }}
+              {% if register_form.business_reg_number.errors %}
+                {% for error in register_form.business_reg_number.errors %}
+                  <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            {# First name #}
+            {% if register_form.first_name.errors %}
+            <div class="form-group has-error">
+            {% else %}
+            <div class="form-group">
+            {% endif %}
+              <label for="first_name"><span class="text-red">*</span>First Name</label>
+              {{ register_form.first_name(class="form-control", placeholder="Enter your first name") }}
+              {% if register_form.first_name.errors %}
+                {% for error in register_form.first_name.errors %}
+                  <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            {# Last name #}
+            {% if register_form.last_name.errors %}
+            <div class="form-group has-error">
+            {% else %}
+            <div class="form-group">
+            {% endif %}
+              <label for="last_name"><span class="text-red">*</span>Last Name</label>
+              {{ register_form.last_name(class="form-control", placeholder="Enter your last name") }}
+              {% if register_form.last_name.errors %}
+                {% for error in register_form.last_name.errors %}
+                  <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            {# Email #}
+            {% if register_form.email.errors %}
+            <div class="form-group has-error">
+            {% else %}
+            <div class="form-group">
+            {% endif %}
+              <label for="email"><span class="text-red">*</span>Company Email</label>
+              {{ register_form.email(class="form-control", placeholder="Enter your company email") }}
+              {% if register_form.email.errors %}
+                {% for error in register_form.email.errors %}
+                  <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            {# Password #}
+            {% if register_form.password.errors %}
+            <div class="form-group has-error">
+            {% else %}
+            <div class="form-group">
+            {% endif %}
+              <label for="password"><span class="text-red">*</span>Password</label>
+              {{ register_form.password(class="form-control", placeholder="Enter password") }}
+              {% if register_form.password.errors %}
+                {% for error in register_form.password.errors %}
+                  <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            {# Confirm password #}
+            {% if register_form.confirm_password.errors %}
+            <div class="form-group has-error">
+            {% else %}
+            <div class="form-group">
+            {% endif %}
+              <label for="Confirm Password"><span class="text-red">*</span>Confirm Password</label>
+              {{ register_form.confirm_password(class="form-control", placeholder="Confirm Password") }}
+              {% if register_form.confirm_password.errors %}
+                {% for error in register_form.confirm_password.errors %}
+                  <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            {# Subscribed #}
+            {% if register_form.is_subscribed.errors %}
+            <div class="form-group has-error">
+            {% else %}
+            <div class="form-group">
+            {% endif %}
+              <label>
+                {{ register_form.is_subscribed }} <small class="text-muted">{{ register_form.is_subscribed.label.text }}</small>
+              </label>
+              {% if register_form.is_subscribed.errors %}
+                {% for error in register_form.is_subscribed.errors %}
+                  <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            {# ToC Agree #}
+            {% if register_form.toc_agree.errors %}
+            <div class="form-group has-error">
+            {% else %}
+            <div class="form-group">
+            {% endif %}
+              <label>
+                {{ register_form.toc_agree }} <small class="text-muted">{{ register_form.toc_agree.label.text }}</small>
+              </label>
+              {% if register_form.toc_agree.errors %}
+                {% for error in register_form.toc_agree.errors %}
+                  <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            {# Captcha Image #}
+            <div class="form-group">
+              <img id="captcha_img" src="{{ captcha }}" style="float: left; padding-right: 3px">
+              <ul class="nav" style="float: left">
+                <li>
+                  <button class="btn btn-default btn-sm" id="refresh_captcha" type="button">
+                    Refresh <i class="fa fa-refresh fa-lg" aria-hidden="true"></i>
+                  </button>
+                </li>
+                <li>
+                  <audio id="audio-captcha" src="{{ audio_captcha }}" controls >
+                  </audio>
+                </li>
+              </ul>
+              <div style="float: right; margin-bottom: 20px; margin-right: 50px;" id="DigiCertClickID_EnlkXdot" data-language="en">
+                <a href="https://www.digicert.com/ssl/"></a>
+              </div>
+            </div>
+
+            {# Captcha text field #}
+            {% if register_form.captcha_text.errors %}
+            <div class="form-group has-error">
+            {% else %}
+            <div id="captcha_container" class="form-group">
+            {% endif %}
+              {{ register_form.captcha_text(class="form-control", placeholder="Captcha", style='text-transform:uppercase') }}
+              {% if register_form.captcha_text.errors %}
+                {% for error in register_form.captcha_text.errors %}
+                  <span class="help-block">{{ error }}</span>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            <div aria-describedby="submit-tooltip" class="form-group">
+              <button id="submit_button" class="btn btn-primary btn-block" type="submit"><span>Sign Up For Free</span></button>
+            </div>
+            <div class="form-group">
+              <small>By clicking Sign Up For Free, you agree to be bound by the TIR Data Protection Policy and the website's.</small> <small><a class="Terms of Use" href="#">Terms of Use</a></small>
+            </div>
+          </form>
+        </div>
+
+      </div> {# end center page #}
+    </div>
+    <br>
+  </div> {# end main body #}
+{% endblock%}
+
+{% block lib_javascript %}
+  <script src="{{ url_for('static', filename='assets/js/jquery.validate.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/js/additional-methods.js') }}"></script>
+{% endblock %}
+
+{% block custom_javascript %}
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    var is_clicked = true;
+    $(".tooltip-icon-reg").click(function(){
+      if (is_clicked) {
+        $(".tooltiptext").css("visibility", "visible");
+      } else {
+        $(".tooltiptext").css("visibility", "hidden");
+      }
+      is_clicked = !is_clicked;
+    });
+  });
+</script>
+
+<!-- Others must be on Last -->
+<script type="text/javascript">
+  $(document).ready(function(){
+
+    $("#categories > optgroup").filter(function(){
+      return this.id == "Others";
+    }).insertAfter("#categories > optgroup:last");
+
+    $("#box > li").filter(function(){
+      return this.id == "Others";
+    }).insertAfter($("#box > li:last"));
+
+  });
+</script>
+
+  {# DigiCert site seal #}
+  <script type="text/javascript">
+  var __dcid = __dcid || [];__dcid.push(["DigiCertClickID_EnlkXdot", "7", "m", "black", "EnlkXdot"]);(function(){var cid=document.createElement("script");cid.async=true;cid.src="//seal.digicert.com/seals/cascade/seal.min.js";var s = document.getElementsByTagName("script");var ls = s[(s.length - 1)];ls.parentNode.insertBefore(cid, ls.nextSibling);}());
+  </script>
+  <script>
+    $("#register_form").validate({
+      rules: {
+        company_name: "required",
+        business_reg_number: {
+          required: true,
+          maxlength: 11
+        },
+        first_name: "required",
+        last_name: "required",
+        email: {
+          required: true,
+          email: true
+        },
+        password: {
+          required: true,
+          minlength: 6
+        },
+        confirm_password: {
+          required: true,
+          minlength: 6,
+          equalTo: "#password"
+        },
+        toc_agree: "required",
+        captcha_text: "required"
+      },
+      messages: {
+        company_name: "Company Name is required.",
+        business_reg_number: {
+          required: "Business Registration Number is required.",
+        },
+        first_name: "First Name is required.",
+        last_name: "Last Name is required.",
+        email: {
+          required: "Email Address is required.",
+        },
+        password: {
+          required: "Password is required.",
+        },
+        confirm_password: {
+          required: "Confirm Password is required.",
+          equalTo: "Passwords must match."
+        },
+        toc_agree: "You haven't accepted our Terms of Use.",
+        captcha_text: "Captcha text is required."
+      },
+      errorElement: "span",
+      errorPlacement: function(error, element) {
+        // Add the `help-block` class to the error element
+        error.addClass("help-block has-error");
+        if (element.prop("type") === "checkbox") {
+          error.insertAfter(element.parent("label"));
+        } else {
+          error.insertAfter(element);
+        }
+      },
+      highlight: function(element, errorClass, validClass ) {
+        $(element).parents(".form-group").addClass("has-error").removeClass("has-success");
+      },
+      unhighlight: function(element, errorClass, validClass) {
+        $(element).parents(".form-group").removeClass("has-error");
+      }
+    });
+  </script>
+
+  {# Scroll bar Categories #}
+  <script>
+    $(document).ready(function () {
+        $('#scrolldown').click(function () {
+            $('#box').animate({
+                scrollTop: '+=50'
+            }, 500);
+        });
+
+    });
+
+    $(document).ready(function () {
+        $('#scrollup').click(function () {
+            $('#box').animate({
+                scrollTop: '-=50'
+            }, 500);
+        });
+    });
+  </script>
+
+  <script>
+  $( "#refresh_captcha" ).click(function() {
+    $.ajax({
+      type: 'GET',
+      contentType: 'application/json; charset=utf-8',
+      url: '/users/__captcha',
+      success: function(data){
+        console.log()
+        $("#captcha_img").attr("src", data.message.image);
+        $("#audio-captcha").attr("src", data.message.audio);
+      },
+      error: function(msg){
+        console.log(msg);
+      }
+    });
+  });
+
+  </script>
+
+  <script>
+    $("#submit_button").click(function(){
+       $("#refresh_captcha").trigger('click');
+    });
+  </script>
+{% endblock %}
