@@ -25,7 +25,7 @@ MarkupSafe==1.0
 ndg-httpsclient==0.4.2
 olefile==0.44
 packaging==16.8
-Pillow==4.1.1
+Pillow==8.2.0
 pusher==1.7.0
 pyasn1==0.2.3
 pycparser==2.17
