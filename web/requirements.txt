@@ -20,7 +20,7 @@ idna==2.5
 ipaddress==1.0.18
 itsdangerous==0.24
 Jinja2==2.9.5
-Mako==1.0.6
+Mako==1.2.2
 MarkupSafe==1.0
 ndg-httpsclient==0.4.2
 olefile==0.44
